@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Upload } from "lucide-react";
 import { TransactionList } from "@/components/transaction-list";
 import { getTransactions, getAccounts, getCategories } from "@/lib/actions";
 import { QuickAdd } from "@/components/quick-add";
@@ -36,10 +36,16 @@ export default async function TransactionsPage({
             <TransactionsFilter />
           </div>
         </div>
-        <Link href="/transactions/new" className="btn btn-primary btn-sm">
-          <Plus className="h-4 w-4" />
-          Add
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/import" className="btn btn-ghost btn-sm">
+            <Upload className="h-4 w-4" />
+            Import
+          </Link>
+          <Link href="/transactions/new" className="btn btn-primary btn-sm">
+            <Plus className="h-4 w-4" />
+            Add
+          </Link>
+        </div>
       </div>
 
       <div className="sm:hidden">

@@ -134,6 +134,48 @@ export const DEFAULT_EXPENSE_CATEGORIES: DefaultCategory[] = [
 ];
 
 // ============================================================
+// CSV Import patterns (for auto-detecting column mappings)
+// ============================================================
+
+export const CSV_DATE_COLUMN_PATTERNS = [
+  "date", "transaction date", "trans date", "posting date", "value date",
+  "txn date", "booked date", "effective date", "settlement date",
+];
+
+export const CSV_DESCRIPTION_COLUMN_PATTERNS = [
+  "description", "narrative", "details", "memo", "particulars",
+  "transaction description", "trans description", "reference",
+  "payee", "merchant", "name",
+];
+
+export const CSV_AMOUNT_COLUMN_PATTERNS = [
+  "amount", "total", "value", "sum", "transaction amount",
+  "trans amount", "amt",
+];
+
+export const CSV_DEBIT_COLUMN_PATTERNS = [
+  "debit", "debit amount", "withdrawal", "withdrawals", "out",
+  "money out", "expense", "charge",
+];
+
+export const CSV_CREDIT_COLUMN_PATTERNS = [
+  "credit", "credit amount", "deposit", "deposits", "in",
+  "money in", "income", "payment",
+];
+
+export const CSV_DATE_FORMATS = [
+  { value: "yyyy-MM-dd", example: "2024-03-15" },
+  { value: "dd/MM/yyyy", example: "15/03/2024" },
+  { value: "MM/dd/yyyy", example: "03/15/2024" },
+  { value: "dd-MM-yyyy", example: "15-03-2024" },
+  { value: "MM-dd-yyyy", example: "03-15-2024" },
+  { value: "d MMM yyyy", example: "15 Mar 2024" },
+  { value: "dd MMM yyyy", example: "15 Mar 2024" },
+  { value: "MMM dd, yyyy", example: "Mar 15, 2024" },
+  { value: "yyyy/MM/dd", example: "2024/03/15" },
+] as const;
+
+// ============================================================
 // Onboarding account templates
 // ============================================================
 

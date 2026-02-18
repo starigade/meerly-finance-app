@@ -1,7 +1,13 @@
 import Link from "next/link";
-import { Shield } from "lucide-react";
+import { Shield, Upload } from "lucide-react";
 
 const settingsItems = [
+  {
+    href: "/import",
+    icon: Upload,
+    title: "Import Transactions",
+    description: "Import transactions from a CSV file",
+  },
   {
     href: "/settings/audit",
     icon: Shield,

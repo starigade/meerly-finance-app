@@ -20,6 +20,8 @@ import type {
   AccountType,
   AccountSubType,
   CategoryType,
+  CsvColumnMapping,
+  CsvImportResult,
 } from "./types";
 
 // ============================================================
@@ -721,4 +723,200 @@ export async function getImbalancedTransactions() {
     p_household_id: household.id,
   });
   return data ?? [];
+}
+
+// ============================================================
+// CSV IMPORT ACTIONS
+// ============================================================
+
+export async function checkDuplicateHashes(
+  hashes: string[]
+): Promise<ActionResult<Set<string>>> {
+  try {
+    const { supabase, household } = await getUserHousehold();
+    const { data, error } = await supabase
+      .from("transactions")
+      .select("import_hash")
+      .eq("household_id", household.id)
+      .in("import_hash", hashes)
+      .is("deleted_at", null);
+
+    if (error) return { success: false, error: error.message };
+    const existing = new Set((data ?? []).map((r) => r.import_hash as string));
+    return { success: true, data: existing };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
+}
+
+export async function bulkCreateTransactions(params: {
+  account_id: string;
+  category_id: string; // default category for all rows
+  currency: string;
+  transactions: {
+    date: string;
+    description: string;
+    amountCents: number;
+    importHash: string;
+  }[];
+}): Promise<ActionResult<CsvImportResult>> {
+  try {
+    const { supabase, user, household } = await getUserHousehold();
+    const CHUNK_SIZE = 50;
+    let imported = 0;
+    let skippedDuplicates = 0;
+    const errors: string[] = [];
+
+    // Check for existing hashes first
+    const allHashes = params.transactions.map((t) => t.importHash);
+    const { data: existingHashes } = await supabase
+      .from("transactions")
+      .select("import_hash")
+      .eq("household_id", household.id)
+      .in("import_hash", allHashes)
+      .is("deleted_at", null);
+
+    const existingSet = new Set(
+      (existingHashes ?? []).map((r) => r.import_hash as string)
+    );
+
+    // Filter out duplicates
+    const newTransactions = params.transactions.filter((t) => {
+      if (existingSet.has(t.importHash)) {
+        skippedDuplicates++;
+        return false;
+      }
+      return true;
+    });
+
+    // Process in chunks
+    for (let i = 0; i < newTransactions.length; i += CHUNK_SIZE) {
+      const chunk = newTransactions.slice(i, i + CHUNK_SIZE);
+
+      for (const txn of chunk) {
+        const isIncome = txn.amountCents > 0;
+        const absAmount = Math.abs(txn.amountCents);
+
+        const entries = isIncome
+          ? createIncomeEntries({
+              categoryId: params.category_id,
+              accountId: params.account_id,
+              amountCents: absAmount,
+              currency: params.currency,
+              baseCurrency: household.base_currency,
+            })
+          : createExpenseEntries({
+              categoryId: params.category_id,
+              accountId: params.account_id,
+              amountCents: absAmount,
+              currency: params.currency,
+              baseCurrency: household.base_currency,
+            });
+
+        const validation = validateBalancedEntries(entries);
+        if (!validation.valid) {
+          errors.push(`Row "${txn.description}": ${validation.error}`);
+          continue;
+        }
+
+        const { data: newTxn, error: txnError } = await supabase
+          .from("transactions")
+          .insert({
+            household_id: household.id,
+            date: txn.date,
+            description: txn.description || null,
+            ui_type: isIncome ? "income" : "expense",
+            import_hash: txn.importHash,
+            created_by: user.id,
+          })
+          .select()
+          .single();
+
+        if (txnError) {
+          errors.push(`Row "${txn.description}": ${txnError.message}`);
+          continue;
+        }
+
+        const { error: entryError } = await supabase
+          .from("transaction_entries")
+          .insert(
+            entries.map((e) => ({
+              transaction_id: newTxn.id,
+              account_id: e.account_id || null,
+              category_id: e.category_id || null,
+              amount: e.amount,
+              currency: e.currency,
+              base_amount: e.base_amount,
+              exchange_rate: e.exchange_rate || null,
+            }))
+          );
+
+        if (entryError) {
+          errors.push(`Row "${txn.description}" entries: ${entryError.message}`);
+          continue;
+        }
+
+        imported++;
+      }
+    }
+
+    revalidatePath("/transactions");
+    revalidatePath("/accounts");
+    revalidatePath("/");
+
+    return {
+      success: true,
+      data: {
+        totalRows: params.transactions.length,
+        imported,
+        skippedDuplicates,
+        errors,
+      },
+    };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
+}
+
+export async function saveCsvMapping(params: {
+  account_id: string;
+  mapping: CsvColumnMapping;
+}): Promise<ActionResult> {
+  try {
+    const { supabase, household } = await getUserHousehold();
+    const { error } = await supabase
+      .from("csv_column_mappings")
+      .upsert(
+        {
+          household_id: household.id,
+          account_id: params.account_id,
+          mapping: params.mapping as unknown as Record<string, unknown>,
+        },
+        { onConflict: "household_id,account_id" }
+      );
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
+}
+
+export async function getCsvMapping(
+  accountId: string
+): Promise<ActionResult<CsvColumnMapping | null>> {
+  try {
+    const { supabase, household } = await getUserHousehold();
+    const { data, error } = await supabase
+      .from("csv_column_mappings")
+      .select("mapping")
+      .eq("household_id", household.id)
+      .eq("account_id", accountId)
+      .maybeSingle();
+
+    if (error) return { success: false, error: error.message };
+    return { success: true, data: data?.mapping as CsvColumnMapping | null ?? null };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
 }

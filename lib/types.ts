@@ -79,6 +79,7 @@ export interface Transaction {
   description: string | null;
   notes: string | null;
   ui_type: TransactionUIType;
+  import_hash: string | null;
   created_at: string;
   updated_at: string;
   created_by: string | null;
@@ -243,4 +244,41 @@ export interface ActionResult<T = void> {
   success: boolean;
   error?: string;
   data?: T;
+}
+
+// ============================================================
+// CSV Import types
+// ============================================================
+
+export interface CsvColumnMapping {
+  dateColumn: string;
+  descriptionColumn: string;
+  mode: "single" | "separate";
+  amountColumn?: string; // For single-amount mode
+  debitColumn?: string; // For separate debit/credit mode
+  creditColumn?: string;
+  dateFormat: string; // e.g. "yyyy-MM-dd", "dd/MM/yyyy", "MM/dd/yyyy"
+  invertSign?: boolean; // Some banks use positive = expense
+}
+
+export interface CsvMappingConfig {
+  id?: string;
+  account_id: string;
+  mapping: CsvColumnMapping;
+}
+
+export interface CsvParsedRow {
+  date: string; // ISO yyyy-MM-dd
+  description: string;
+  amountCents: number; // positive = inflow, negative = outflow
+  importHash: string;
+  originalRow: Record<string, string>;
+  isDuplicate?: boolean;
+}
+
+export interface CsvImportResult {
+  totalRows: number;
+  imported: number;
+  skippedDuplicates: number;
+  errors: string[];
 }
