@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Expo
+.expo/
+dist/
+web-build/
+*.expo.tar.gz
+
+# Build
+android/.gradle/
+android/build/
+ios/build/
+*.ipa
+*.apk
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment
+.env
+.env.local
+.env.*.local
