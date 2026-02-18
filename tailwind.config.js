@@ -8,7 +8,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Warm, approachable palette (Notion/YNAB inspired)
         brand: {
           50: "#fef7ed",
           100: "#fdecd4",
@@ -42,10 +41,16 @@ module.exports = {
       },
       fontFamily: {
         sans: [
-          "var(--font-inter)",
+          "var(--font-geist-sans)",
           "system-ui",
           "-apple-system",
           "sans-serif",
+        ],
+        mono: [
+          "var(--font-geist-mono)",
+          "ui-monospace",
+          "SFMono-Regular",
+          "monospace",
         ],
       },
       borderRadius: {
@@ -59,5 +64,34 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("daisyui")],
+  daisyui: {
+    themes: [
+      {
+        meerly: {
+          "primary": "#ee7b18",
+          "primary-content": "#ffffff",
+          "secondary": "#f9f5f0",
+          "secondary-content": "#1c1917",
+          "accent": "#f19038",
+          "accent-content": "#1c1917",
+          "neutral": "#78716c",
+          "neutral-content": "#fefcf9",
+          "base-100": "#fefcf9",
+          "base-200": "#f9f5f0",
+          "base-300": "#f3ede5",
+          "base-content": "#1c1917",
+          "info": "#0ea5e9",
+          "success": "#16a34a",
+          "warning": "#f59e0b",
+          "error": "#dc2626",
+          "--rounded-box": "0.75rem",
+          "--rounded-btn": "0.5rem",
+          "--rounded-badge": "0.5rem",
+          "--tab-radius": "0.5rem",
+        },
+      },
+    ],
+    darkTheme: false,
+  },
 };

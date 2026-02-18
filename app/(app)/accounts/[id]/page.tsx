@@ -4,15 +4,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatMoney, formatAmount } from "@/lib/currency";
+import { formatMoney } from "@/lib/currency";
 import { formatDate } from "@/lib/dates";
-import { ACCOUNT_SUB_TYPES, UI_LABELS } from "@/lib/constants";
+import { ACCOUNT_SUB_TYPES } from "@/lib/constants";
 
 export default async function AccountDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
 
   const { data: account } = await supabase
     .from("account_balances")
@@ -22,7 +20,6 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
 
   if (!account) notFound();
 
-  // Get recent transactions for this account
   const { data: entries } = await supabase
     .from("transaction_entries")
     .select(`
@@ -39,69 +36,63 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 max-w-2xl mx-auto">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/accounts">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
+        <Link href="/accounts" className="btn btn-ghost btn-sm btn-square">
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{account.name}</h1>
-          <p className="text-sm text-muted">
+          <h1 className="text-lg font-semibold">{account.name}</h1>
+          <p className="text-xs text-neutral">
             {ACCOUNT_SUB_TYPES[account.sub_type as keyof typeof ACCOUNT_SUB_TYPES]?.label ?? account.sub_type} &middot; {account.currency}
           </p>
         </div>
       </div>
 
       {/* Balance */}
-      <Card>
-        <CardContent className="p-6 text-center">
-          <p className="text-sm text-muted mb-1">Current Balance</p>
-          <p className="text-4xl font-bold text-gray-900">
+      <div className="card bg-base-100 border border-base-300">
+        <div className="card-body p-6 text-center">
+          <p className="text-xs text-neutral uppercase tracking-wider mb-1">Current Balance</p>
+          <p className="text-3xl font-bold font-mono tabular-nums">
             {formatMoney(account.balance, account.currency)}
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Transaction History */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
+      <div className="card bg-base-100 border border-base-300">
+        <div className="card-body p-4">
+          <h2 className="text-sm font-semibold mb-2">Recent Activity</h2>
           {activeEntries.length === 0 ? (
-            <p className="text-center text-muted py-8 px-5">No transactions yet</p>
+            <p className="text-center text-neutral py-6 text-sm">No transactions yet</p>
           ) : (
-            <div className="divide-y divide-surface-tertiary">
-              {activeEntries.map((entry) => (
-                <Link
-                  key={entry.id}
-                  href={`/transactions/${entry.transaction.id}`}
-                  className="flex items-center justify-between px-5 py-3 hover:bg-surface-secondary transition-colors"
-                >
-                  <div>
-                    <p className="font-medium text-sm text-gray-900">
-                      {entry.transaction.description ?? entry.category?.name ?? "Transaction"}
-                    </p>
-                    <p className="text-xs text-muted">
-                      {formatDate(entry.transaction.date)}
-                    </p>
-                  </div>
-                  <p
-                    className={`font-semibold text-sm ${
-                      entry.amount > 0 ? "text-success" : "text-danger"
-                    }`}
-                  >
-                    {entry.amount > 0 ? "+" : ""}
-                    {formatMoney(entry.amount, entry.currency)}
-                  </p>
-                </Link>
-              ))}
-            </div>
+            <table className="table table-sm">
+              <tbody>
+                {activeEntries.map((entry) => (
+                  <tr key={entry.id} className="hover">
+                    <td>
+                      <Link href={`/transactions/${entry.transaction.id}`} className="hover:text-primary">
+                        <p className="font-medium text-sm">
+                          {entry.transaction.description ?? entry.category?.name ?? "Transaction"}
+                        </p>
+                        <p className="text-xs text-neutral">
+                          {formatDate(entry.transaction.date)}
+                        </p>
+                      </Link>
+                    </td>
+                    <td className="text-right">
+                      <span className={`font-mono tabular-nums text-sm font-medium ${entry.amount > 0 ? "text-success" : "text-error"}`}>
+                        {entry.amount > 0 ? "+" : ""}
+                        {formatMoney(entry.amount, entry.currency)}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

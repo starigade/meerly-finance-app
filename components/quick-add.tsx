@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -43,13 +41,11 @@ export function QuickAdd({ accounts, categories }: QuickAddProps) {
   const incomeCategories = categories.filter((c) => c.category_type === "income" && c.is_active);
   const activeAccounts = accounts.filter((a) => a.is_active);
 
-  // Reset form when opening
   useEffect(() => {
     if (open) {
       setAmount("");
       setCategoryId("");
       setDescription("");
-      // Default to last-used or first account
       if (activeAccounts.length > 0 && !accountId) {
         setAccountId(activeAccounts[0].id);
       }
@@ -103,7 +99,7 @@ export function QuickAdd({ accounts, categories }: QuickAddProps) {
       {/* FAB */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-30 w-14 h-14 rounded-2xl bg-brand-500 text-white shadow-elevated hover:bg-brand-600 transition-all hover:scale-105 flex items-center justify-center"
+        className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-30 btn btn-primary btn-circle btn-lg shadow-elevated"
       >
         <Plus className="h-6 w-6" />
       </button>
@@ -115,25 +111,21 @@ export function QuickAdd({ accounts, categories }: QuickAddProps) {
             <DialogTitle>Quick Add</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Type toggle */}
             <div className="flex gap-2">
-              <Button
-                variant={uiType === "expense" ? "default" : "outline"}
-                className="flex-1"
-                size="sm"
+              <button
+                className={`btn btn-sm flex-1 ${uiType === "expense" ? "btn-primary" : "btn-outline"}`}
                 onClick={() => { setUiType("expense"); setCategoryId(""); }}
               >
                 Expense
-              </Button>
-              <Button
-                variant={uiType === "income" ? "default" : "outline"}
-                className="flex-1"
-                size="sm"
+              </button>
+              <button
+                className={`btn btn-sm flex-1 ${uiType === "income" ? "btn-primary" : "btn-outline"}`}
                 onClick={() => { setUiType("income"); setCategoryId(""); }}
               >
                 Income
-              </Button>
+              </button>
             </div>
 
             {/* Amount */}
@@ -144,10 +136,10 @@ export function QuickAdd({ accounts, categories }: QuickAddProps) {
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="text-2xl font-bold h-16 text-center"
+                className="text-2xl font-bold font-mono h-16 text-center"
                 autoFocus
               />
-              <p className="text-xs text-muted text-center mt-1">{currency}</p>
+              <p className="text-xs text-neutral text-center mt-1">{currency}</p>
             </div>
 
             {/* Category */}
@@ -191,9 +183,9 @@ export function QuickAdd({ accounts, categories }: QuickAddProps) {
               onChange={(e) => setDescription(e.target.value)}
             />
 
-            <Button className="w-full" onClick={handleSubmit} disabled={loading}>
-              {loading ? "Adding..." : "Save"}
-            </Button>
+            <button className="btn btn-primary w-full" onClick={handleSubmit} disabled={loading}>
+              {loading ? <span className="loading loading-spinner loading-sm"></span> : "Save"}
+            </button>
           </div>
         </DialogContent>
       </Dialog>

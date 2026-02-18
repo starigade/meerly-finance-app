@@ -1,9 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { Plus, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus } from "lucide-react";
 import { TransactionList } from "@/components/transaction-list";
 import { getTransactions, getAccounts, getCategories } from "@/lib/actions";
 import { QuickAdd } from "@/components/quick-add";
@@ -27,27 +25,32 @@ export default async function TransactionsPage({
   ]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Transactions</h1>
-          <p className="text-sm text-muted">{transactions.length} transactions</p>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <h1 className="text-lg font-semibold whitespace-nowrap">
+            Transactions
+            <span className="text-neutral font-normal text-sm ml-2">({transactions.length})</span>
+          </h1>
+          <div className="flex-1 max-w-sm hidden sm:block">
+            <TransactionsFilter />
+          </div>
         </div>
-        <Button asChild>
-          <Link href="/transactions/new">
-            <Plus className="h-4 w-4 mr-1" />
-            Add
-          </Link>
-        </Button>
+        <Link href="/transactions/new" className="btn btn-primary btn-sm">
+          <Plus className="h-4 w-4" />
+          Add
+        </Link>
       </div>
 
-      <TransactionsFilter />
+      <div className="sm:hidden">
+        <TransactionsFilter />
+      </div>
 
-      <Card>
-        <CardContent className="p-4">
+      <div className="card bg-base-100 border border-base-300">
+        <div className="card-body p-0">
           <TransactionList transactions={transactions} />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <QuickAdd accounts={accounts} categories={categories} />
     </div>

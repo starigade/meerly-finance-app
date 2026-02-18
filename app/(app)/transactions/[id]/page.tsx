@@ -14,14 +14,13 @@ export default async function EditTransactionPage({ params }: { params: Promise<
 
   if (!transaction) notFound();
 
-  // Normalize the transaction shape for the form
   const normalized = {
     ...transaction,
     entries: transaction.transaction_entries ?? [],
   };
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="max-w-2xl mx-auto">
       <TransactionForm
         accounts={accounts}
         categories={categories}

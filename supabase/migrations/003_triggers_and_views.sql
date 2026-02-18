@@ -46,21 +46,21 @@ DECLARE
   new_household_id UUID;
 BEGIN
   -- Create default household
-  INSERT INTO households (name, user_id)
+  INSERT INTO public.households (name, user_id)
   VALUES ('My Household', NEW.id)
   RETURNING id INTO new_household_id;
 
   -- Create equity account for opening balances
-  INSERT INTO accounts (household_id, name, account_type, sub_type, currency, created_by)
+  INSERT INTO public.accounts (household_id, name, account_type, sub_type, currency, created_by)
   VALUES (new_household_id, 'Opening Balances', 'equity', 'opening_balances', 'SGD', NEW.id);
 
   -- Create user preferences
-  INSERT INTO user_preferences (user_id, default_household_id)
+  INSERT INTO public.user_preferences (user_id, default_household_id)
   VALUES (NEW.id, new_household_id);
 
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users

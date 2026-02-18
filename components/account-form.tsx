@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue, SelectGroup, SelectSeparator } from "@/components/ui/select";
 import { createAccount } from "@/lib/actions";
 import { ASSET_SUB_TYPES, LIABILITY_SUB_TYPES, ACCOUNT_SUB_TYPES, COMMON_CURRENCIES, DEFAULT_CURRENCY } from "@/lib/constants";
@@ -50,13 +48,11 @@ export function AccountForm() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Add Account</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="card bg-base-100 border border-base-300">
+      <div className="card-body p-4">
+        <h2 className="text-lg font-semibold mb-3">Add Account</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+          <div className="form-control">
             <Label htmlFor="name">Account Name</Label>
             <Input
               id="name"
@@ -68,7 +64,7 @@ export function AccountForm() {
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="form-control">
             <Label>Account Type</Label>
             <Select value={subType} onValueChange={(v) => setSubType(v as AccountSubType)}>
               <SelectTrigger>
@@ -97,7 +93,7 @@ export function AccountForm() {
           </div>
 
           <div className="flex gap-3">
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 form-control">
               <Label htmlFor="balance">Current Balance</Label>
               <Input
                 id="balance"
@@ -108,7 +104,7 @@ export function AccountForm() {
                 onChange={(e) => setBalance(e.target.value)}
               />
             </div>
-            <div className="w-32 space-y-2">
+            <div className="w-32 form-control">
               <Label>Currency</Label>
               <Select value={currency} onValueChange={setCurrency}>
                 <SelectTrigger>
@@ -125,7 +121,7 @@ export function AccountForm() {
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="form-control">
             <Label htmlFor="notes">Notes (optional)</Label>
             <Input
               id="notes"
@@ -136,15 +132,15 @@ export function AccountForm() {
           </div>
 
           <div className="flex gap-3 pt-2">
-            <Button type="button" variant="ghost" className="flex-1" onClick={() => router.back()}>
+            <button type="button" className="btn btn-ghost flex-1" onClick={() => router.back()}>
               Cancel
-            </Button>
-            <Button type="submit" className="flex-1" disabled={loading}>
-              {loading ? "Creating..." : "Add Account"}
-            </Button>
+            </button>
+            <button type="submit" className="btn btn-primary flex-1" disabled={loading}>
+              {loading ? <span className="loading loading-spinner loading-sm"></span> : "Add Account"}
+            </button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

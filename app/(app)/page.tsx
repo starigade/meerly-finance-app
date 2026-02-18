@@ -2,10 +2,9 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { SummaryCards } from "@/components/summary-cards";
+import { MetricsBar } from "@/components/metrics-bar";
 import { NetWorthSparkline } from "@/components/net-worth-sparkline";
+import { AccountsPanel } from "@/components/accounts-panel";
 import { TransactionList } from "@/components/transaction-list";
 import { QuickAdd } from "@/components/quick-add";
 import { getDashboardData, getAccounts, getCategories, checkOnboardingComplete } from "@/lib/actions";
@@ -21,55 +20,67 @@ export default async function DashboardPage() {
     getCategories(),
   ]);
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-muted">Your financial overview</p>
-      </div>
+  const hasSnapshots = dashboard.snapshots.length >= 2;
 
-      <SummaryCards
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Metrics strip */}
+      <MetricsBar
         netWorth={dashboard.netWorth}
         monthlyIncome={dashboard.monthlyIncome}
         monthlyExpense={dashboard.monthlyExpense}
         baseCurrency={dashboard.household.base_currency}
       />
 
-      {/* Net Worth Trend */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">Net Worth Trend</CardTitle>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/reports/net-worth" className="text-xs">
-              View Report <ArrowRight className="h-3 w-3 ml-1" />
-            </Link>
-          </Button>
-        </CardHeader>
-        <CardContent className="pb-4">
-          <NetWorthSparkline
-            snapshots={dashboard.snapshots}
-            baseCurrency={dashboard.household.base_currency}
-          />
-        </CardContent>
-      </Card>
+      {/* Main content: chart + accounts side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        {/* Chart — takes 3 of 5 columns */}
+        <div className="lg:col-span-3 card bg-base-100 border border-base-300">
+          <div className="card-body p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-sm font-semibold">Net Worth Trend</h2>
+              <Link href="/reports" className="btn btn-ghost btn-xs text-xs gap-1">
+                View Report <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+            <NetWorthSparkline
+              snapshots={dashboard.snapshots}
+              baseCurrency={dashboard.household.base_currency}
+              compact={!hasSnapshots}
+            />
+          </div>
+        </div>
+
+        {/* Accounts — takes 2 of 5 columns */}
+        <div className="lg:col-span-2 card bg-base-100 border border-base-300">
+          <div className="card-body p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-sm font-semibold">Accounts</h2>
+              <Link href="/accounts" className="btn btn-ghost btn-xs text-xs gap-1">
+                All <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+            <AccountsPanel balances={dashboard.balances} />
+          </div>
+        </div>
+      </div>
 
       {/* Recent Transactions */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">Recent Transactions</CardTitle>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/transactions" className="text-xs">
-              View All <ArrowRight className="h-3 w-3 ml-1" />
+      <div className="card bg-base-100 border border-base-300">
+        <div className="card-body p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-sm font-semibold">Recent Transactions</h2>
+            <Link href="/transactions" className="btn btn-ghost btn-xs text-xs gap-1">
+              View All <ArrowRight className="h-3 w-3" />
             </Link>
-          </Button>
-        </CardHeader>
-        <CardContent>
+          </div>
           <TransactionList
             transactions={dashboard.recentTransactions}
             showDelete={false}
+            compact
           />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <QuickAdd accounts={accounts} categories={categories} />
     </div>

@@ -1,10 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createCategory } from "@/lib/actions";
 import { toast } from "sonner";
 import type { CategoryType } from "@/lib/types";
@@ -50,8 +47,8 @@ export function CategoryForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex items-end gap-2">
-      <div className="flex-1 space-y-1">
-        <Label className="text-xs">Name</Label>
+      <div className="flex-1 form-control">
+        <label className="label text-xs font-medium">Name</label>
         <Input
           placeholder={`New ${type} category`}
           value={name}
@@ -59,8 +56,8 @@ export function CategoryForm({
           required
         />
       </div>
-      <div className="space-y-1">
-        <Label className="text-xs">Color</Label>
+      <div className="form-control">
+        <label className="label text-xs font-medium">Color</label>
         <div className="flex gap-1 flex-wrap max-w-[200px]">
           {COLORS.slice(0, 8).map((c) => (
             <button
@@ -68,16 +65,16 @@ export function CategoryForm({
               type="button"
               onClick={() => setColor(c)}
               className={`w-6 h-6 rounded-md transition-all ${
-                color === c ? "ring-2 ring-offset-1 ring-gray-400 scale-110" : ""
+                color === c ? "ring-2 ring-offset-1 ring-base-content/30 scale-110" : ""
               }`}
               style={{ backgroundColor: c }}
             />
           ))}
         </div>
       </div>
-      <Button type="submit" size="sm" disabled={loading}>
+      <button type="submit" className="btn btn-primary btn-sm" disabled={loading}>
         Add
-      </Button>
+      </button>
     </form>
   );
 }

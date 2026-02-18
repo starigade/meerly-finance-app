@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -18,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createTransaction, updateTransaction } from "@/lib/actions";
-import { COMMON_CURRENCIES, DEFAULT_CURRENCY, TRANSACTION_TYPE_LABELS } from "@/lib/constants";
+import { COMMON_CURRENCIES, DEFAULT_CURRENCY } from "@/lib/constants";
 import { toast } from "sonner";
 import type { Account, Category, TransactionUIType, TransactionWithEntries } from "@/lib/types";
 
@@ -34,7 +32,6 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
 
   const isEdit = !!editTransaction;
 
-  // Derive initial values from edit transaction
   const initialType = editTransaction?.ui_type ?? "expense";
   const [uiType, setUiType] = useState<TransactionUIType>(initialType);
   const [date, setDate] = useState(
@@ -73,7 +70,6 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
   const expenseCategories = categories.filter((c) => c.category_type === "expense" && c.is_active);
   const activeAccounts = accounts.filter((a) => a.is_active);
 
-  // Auto-set currency from selected account
   useEffect(() => {
     if (uiType === "transfer" && fromAccountId) {
       const acc = accounts.find((a) => a.id === fromAccountId);
@@ -121,11 +117,9 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{isEdit ? "Edit Transaction" : "New Transaction"}</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="card bg-base-100 border border-base-300">
+      <div className="card-body p-4">
+        <h2 className="text-lg font-semibold mb-3">{isEdit ? "Edit Transaction" : "New Transaction"}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Transaction type tabs */}
           <Tabs
@@ -141,7 +135,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
 
           {/* Amount + Currency */}
           <div className="flex gap-2">
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 form-control">
               <Label htmlFor="amount">Amount</Label>
               <Input
                 id="amount"
@@ -151,12 +145,12 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="text-xl font-bold h-14"
+                className="text-xl font-bold font-mono h-14"
                 autoFocus
                 required
               />
             </div>
-            <div className="w-24 space-y-2">
+            <div className="w-24 form-control">
               <Label>Currency</Label>
               <Select value={currency} onValueChange={setCurrency}>
                 <SelectTrigger className="h-14">
@@ -175,38 +169,24 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
 
           {/* Category (expense/income only) */}
           {uiType !== "transfer" && (
-            <div className="space-y-2">
+            <div className="form-control">
               <Label>Category</Label>
               <Select value={categoryId} onValueChange={setCategoryId} required>
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {uiType === "expense" ? (
-                    expenseCategories.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        <span className="flex items-center gap-2">
-                          <span
-                            className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: c.color ?? "#6b7280" }}
-                          />
-                          {c.name}
-                        </span>
-                      </SelectItem>
-                    ))
-                  ) : (
-                    incomeCategories.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        <span className="flex items-center gap-2">
-                          <span
-                            className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: c.color ?? "#6b7280" }}
-                          />
-                          {c.name}
-                        </span>
-                      </SelectItem>
-                    ))
-                  )}
+                  {(uiType === "expense" ? expenseCategories : incomeCategories).map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      <span className="flex items-center gap-2">
+                        <span
+                          className="w-2 h-2 rounded-full"
+                          style={{ backgroundColor: c.color ?? "#6b7280" }}
+                        />
+                        {c.name}
+                      </span>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -214,7 +194,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
 
           {/* Account (expense/income) */}
           {uiType !== "transfer" && (
-            <div className="space-y-2">
+            <div className="form-control">
               <Label>{uiType === "expense" ? "From Account" : "To Account"}</Label>
               <Select value={accountId} onValueChange={setAccountId} required>
                 <SelectTrigger>
@@ -234,7 +214,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
           {/* From/To accounts (transfer) */}
           {uiType === "transfer" && (
             <>
-              <div className="space-y-2">
+              <div className="form-control">
                 <Label>From Account</Label>
                 <Select value={fromAccountId} onValueChange={setFromAccountId} required>
                   <SelectTrigger>
@@ -249,7 +229,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
+              <div className="form-control">
                 <Label>To Account</Label>
                 <Select value={toAccountId} onValueChange={setToAccountId} required>
                   <SelectTrigger>
@@ -270,7 +250,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
           )}
 
           {/* Date */}
-          <div className="space-y-2">
+          <div className="form-control">
             <Label htmlFor="date">Date</Label>
             <Input
               id="date"
@@ -282,7 +262,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
           </div>
 
           {/* Description */}
-          <div className="space-y-2">
+          <div className="form-control">
             <Label htmlFor="description">Description (optional)</Label>
             <Input
               id="description"
@@ -294,21 +274,19 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
 
           {/* Actions */}
           <div className="flex gap-3 pt-2">
-            <Button type="button" variant="ghost" className="flex-1" onClick={() => router.back()}>
+            <button type="button" className="btn btn-ghost flex-1" onClick={() => router.back()}>
               Cancel
-            </Button>
-            <Button type="submit" className="flex-1" disabled={loading}>
+            </button>
+            <button type="submit" className="btn btn-primary flex-1" disabled={loading}>
               {loading
-                ? isEdit
-                  ? "Saving..."
-                  : "Adding..."
+                ? <span className="loading loading-spinner loading-sm"></span>
                 : isEdit
                   ? "Save Changes"
                   : "Add Transaction"}
-            </Button>
+            </button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

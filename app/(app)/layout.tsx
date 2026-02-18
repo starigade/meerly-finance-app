@@ -5,14 +5,18 @@ import { BottomNav } from "@/components/bottom-nav";
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SupabaseProvider>
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <main className="flex-1 min-h-screen pb-20 md:pb-0">
-          <div className="max-w-5xl mx-auto px-4 py-6 md:px-8">
+      <div className="drawer lg:drawer-open">
+        <input id="app-drawer" type="checkbox" className="drawer-toggle" />
+        <div className="drawer-content flex flex-col min-h-screen">
+          <main className="flex-1 px-4 py-3 md:px-6 pb-20 lg:pb-3 max-w-6xl">
             {children}
-          </div>
-        </main>
-        <BottomNav />
+          </main>
+          <BottomNav />
+        </div>
+        <div className="drawer-side z-40">
+          <label htmlFor="app-drawer" className="drawer-overlay" aria-label="close sidebar"></label>
+          <Sidebar />
+        </div>
       </div>
     </SupabaseProvider>
   );

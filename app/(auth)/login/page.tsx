@@ -4,10 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export default function LoginPage() {
@@ -34,20 +30,30 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-surface">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center pb-2">
-          <div className="text-3xl font-bold text-brand-500 mb-2">Meerly</div>
-          <CardTitle>Welcome back</CardTitle>
-          <CardDescription>Sign in to your account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-base-200">
+      {/* Brand */}
+      <div className="mb-6 text-center">
+        <h1 className="text-3xl font-bold text-primary tracking-tight">Meerly</h1>
+        <p className="text-xs text-neutral mt-1 tracking-wide uppercase">Personal Finance</p>
+      </div>
+
+      {/* Card */}
+      <div className="card bg-base-100 shadow-lg border border-base-300 w-full max-w-sm">
+        <div className="card-body p-6 gap-4">
+          <div>
+            <h2 className="text-lg font-semibold">Welcome back</h2>
+            <p className="text-sm text-neutral">Sign in to your account</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-3">
+            <div className="form-control">
+              <label className="label py-1" htmlFor="email">
+                <span className="label-text text-sm font-medium">Email</span>
+              </label>
+              <input
                 id="email"
                 type="email"
+                className="input input-bordered w-full input-sm h-10"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -55,29 +61,39 @@ export default function LoginPage() {
                 autoFocus
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
+            <div className="form-control">
+              <label className="label py-1" htmlFor="password">
+                <span className="label-text text-sm font-medium">Password</span>
+              </label>
+              <input
                 id="password"
                 type="password"
+                className="input input-bordered w-full input-sm h-10"
                 placeholder="Your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign In"}
-            </Button>
+            <button type="submit" className="btn btn-primary w-full mt-1" disabled={loading}>
+              {loading ? <span className="loading loading-spinner loading-sm" /> : "Sign In"}
+            </button>
           </form>
-          <p className="text-center text-sm text-muted mt-4">
+
+          <div className="divider my-0 text-xs text-neutral">or</div>
+
+          <p className="text-center text-sm text-neutral">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-brand-500 hover:underline font-medium">
+            <Link href="/signup" className="link link-primary font-medium">
               Sign up
             </Link>
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      <p className="text-xs text-neutral/60 mt-6">
+        Double-entry accounting, made simple.
+      </p>
     </div>
   );
 }

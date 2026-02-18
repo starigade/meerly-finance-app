@@ -1,16 +1,14 @@
 export const dynamic = "force-dynamic";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Shield, CheckCircle, AlertTriangle } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, CheckCircle, AlertTriangle } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase";
 
 export default async function AuditPage() {
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
 
-  // Check for imbalanced transactions
   const { data: imbalanced } = await supabase.rpc("check_imbalanced_transactions");
 
-  // Fallback: direct query if RPC doesn't exist yet
   let imbalancedCount = 0;
   if (imbalanced === null) {
     const { data: entries } = await supabase
@@ -31,55 +29,57 @@ export default async function AuditPage() {
   const isBalanced = imbalancedCount === 0;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Audit</h1>
-        <p className="text-sm text-muted">Verify your accounting data integrity</p>
+    <div className="space-y-4 max-w-2xl mx-auto">
+      <div className="flex items-center gap-3">
+        <Link href="/settings" className="btn btn-ghost btn-sm btn-square">
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
+        <h1 className="text-lg font-semibold">Audit</h1>
       </div>
 
-      <Card className={isBalanced ? "border-success/30" : "border-danger/30"}>
-        <CardContent className="p-8 text-center">
+      <div className={`card border ${isBalanced ? "border-success/30" : "border-error/30"}`}>
+        <div className="card-body p-8 text-center">
           {isBalanced ? (
             <>
-              <CheckCircle className="h-16 w-16 text-success mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Books are balanced!</h2>
-              <p className="text-muted">
+              <CheckCircle className="h-16 w-16 text-success mx-auto mb-3" />
+              <h2 className="text-lg font-bold mb-1">Books are balanced!</h2>
+              <p className="text-sm text-neutral">
                 All transactions have entries that sum to zero. Your double-entry accounting is correct.
               </p>
             </>
           ) : (
             <>
-              <AlertTriangle className="h-16 w-16 text-danger mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
+              <AlertTriangle className="h-16 w-16 text-error mx-auto mb-3" />
+              <h2 className="text-lg font-bold mb-1">
                 {imbalancedCount} imbalanced transaction{imbalancedCount > 1 ? "s" : ""}
               </h2>
-              <p className="text-muted">
+              <p className="text-sm text-neutral">
                 Some transactions have entries that don&apos;t sum to zero. This indicates a data integrity issue.
               </p>
             </>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">How it works</CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-muted space-y-2">
-          <p>
-            Every transaction in Meerly uses double-entry accounting. This means each transaction has
-            two or more entries that must sum to exactly zero in the base currency.
-          </p>
-          <p>
-            For example, a S$50 grocery expense creates two entries: +S$50 to the Groceries category
-            and -S$50 from your checking account. The sum is zero.
-          </p>
-          <p>
-            This audit checks that all transactions follow this rule. If any don&apos;t, it likely means
-            a bug created an incomplete transaction.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="card bg-base-100 border border-base-300">
+        <div className="card-body p-4">
+          <h2 className="text-sm font-semibold mb-2">How it works</h2>
+          <div className="text-sm text-neutral space-y-2">
+            <p>
+              Every transaction in Meerly uses double-entry accounting. This means each transaction has
+              two or more entries that must sum to exactly zero in the base currency.
+            </p>
+            <p>
+              For example, a S$50 grocery expense creates two entries: +S$50 to the Groceries category
+              and -S$50 from your checking account. The sum is zero.
+            </p>
+            <p>
+              This audit checks that all transactions follow this rule. If any don&apos;t, it likely means
+              a bug created an incomplete transaction.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

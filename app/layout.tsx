@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { Toaster } from "sonner";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
 
 export const metadata: Metadata = {
   title: "Meerly Finance",
@@ -19,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="bg-surface font-sans min-h-screen text-gray-900 antialiased">
+    <html lang="en" data-theme="meerly" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className="font-sans min-h-screen antialiased">
         {children}
         <Toaster
           position="top-center"

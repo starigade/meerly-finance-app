@@ -1,6 +1,6 @@
 "use client";
 
-import { ResponsiveContainer, AreaChart, Area, Tooltip, XAxis } from "recharts";
+import { ResponsiveContainer, AreaChart, Area, Tooltip, XAxis, YAxis } from "recharts";
 import { formatMoney } from "@/lib/currency";
 import { formatMonthYear } from "@/lib/dates";
 import type { NetWorthSnapshot } from "@/lib/types";
@@ -8,12 +8,13 @@ import type { NetWorthSnapshot } from "@/lib/types";
 interface NetWorthSparklineProps {
   snapshots: NetWorthSnapshot[];
   baseCurrency: string;
+  compact?: boolean;
 }
 
-export function NetWorthSparkline({ snapshots, baseCurrency }: NetWorthSparklineProps) {
+export function NetWorthSparkline({ snapshots, baseCurrency, compact = false }: NetWorthSparklineProps) {
   if (snapshots.length < 2) {
     return (
-      <div className="h-24 flex items-center justify-center text-sm text-muted">
+      <div className={`${compact ? "h-24" : "h-[280px]"} flex items-center justify-center text-sm text-neutral`}>
         Net worth trend will appear after your second month
       </div>
     );
@@ -25,15 +26,32 @@ export function NetWorthSparkline({ snapshots, baseCurrency }: NetWorthSparkline
   }));
 
   return (
-    <div className="h-24">
+    <div className={compact ? "h-24" : "h-[280px]"}>
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 4 }}>
+        <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: compact ? 4 : 8 }}>
           <defs>
             <linearGradient id="netWorthGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#ee7b18" stopOpacity={0.2} />
               <stop offset="95%" stopColor="#ee7b18" stopOpacity={0} />
             </linearGradient>
           </defs>
+          {!compact && (
+            <>
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 11, fill: "#78716c" }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                tickFormatter={(v) => formatMoney(v, baseCurrency, { compact: true })}
+                tick={{ fontSize: 11, fill: "#78716c" }}
+                tickLine={false}
+                axisLine={false}
+                width={60}
+              />
+            </>
+          )}
           <Area
             type="monotone"
             dataKey="value"
@@ -46,9 +64,9 @@ export function NetWorthSparkline({ snapshots, baseCurrency }: NetWorthSparkline
               if (!active || !payload?.[0]) return null;
               const { month, value } = payload[0].payload;
               return (
-                <div className="bg-white rounded-lg shadow-elevated px-3 py-2 text-xs border border-surface-tertiary">
-                  <p className="text-muted">{month}</p>
-                  <p className="font-semibold">{formatMoney(value, baseCurrency)}</p>
+                <div className="bg-base-100 rounded-lg shadow-elevated px-3 py-2 text-xs border border-base-300">
+                  <p className="text-neutral">{month}</p>
+                  <p className="font-semibold font-mono">{formatMoney(value, baseCurrency)}</p>
                 </div>
               );
             }}

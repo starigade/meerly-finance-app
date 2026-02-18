@@ -27,7 +27,7 @@ import type {
 // ============================================================
 
 async function getAuthUser() {
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -7,7 +7,7 @@ export default async function NewTransactionPage() {
   const [accounts, categories] = await Promise.all([getAccounts(), getCategories()]);
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="max-w-2xl mx-auto">
       <TransactionForm accounts={accounts} categories={categories} />
     </div>
   );

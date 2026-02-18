@@ -33,10 +33,11 @@ ON CONFLICT (code) DO NOTHING;
 CREATE OR REPLACE FUNCTION seed_default_categories(p_household_id UUID, p_user_id UUID)
 RETURNS void
 LANGUAGE plpgsql
+SET search_path = public
 AS $$
 BEGIN
   -- Income categories
-  INSERT INTO categories (household_id, name, category_type, icon, color, created_by) VALUES
+  INSERT INTO public.categories (household_id, name, category_type, icon, color, created_by) VALUES
     (p_household_id, 'Salary', 'income', 'briefcase', '#16a34a', p_user_id),
     (p_household_id, 'Freelance', 'income', 'laptop', '#059669', p_user_id),
     (p_household_id, 'Interest', 'income', 'percent', '#0d9488', p_user_id),
@@ -45,7 +46,7 @@ BEGIN
     (p_household_id, 'Other Income', 'income', 'plus-circle', '#6b7280', p_user_id);
 
   -- Expense categories
-  INSERT INTO categories (household_id, name, category_type, icon, color, created_by) VALUES
+  INSERT INTO public.categories (household_id, name, category_type, icon, color, created_by) VALUES
     (p_household_id, 'Groceries', 'expense', 'shopping-cart', '#dc2626', p_user_id),
     (p_household_id, 'Dining Out', 'expense', 'utensils', '#ea580c', p_user_id),
     (p_household_id, 'Transport', 'expense', 'car', '#d97706', p_user_id),
@@ -71,21 +72,21 @@ DECLARE
   new_household_id UUID;
 BEGIN
   -- Create default household
-  INSERT INTO households (name, user_id)
+  INSERT INTO public.households (name, user_id)
   VALUES ('My Household', NEW.id)
   RETURNING id INTO new_household_id;
 
   -- Create equity account for opening balances
-  INSERT INTO accounts (household_id, name, account_type, sub_type, currency, created_by)
+  INSERT INTO public.accounts (household_id, name, account_type, sub_type, currency, created_by)
   VALUES (new_household_id, 'Opening Balances', 'equity', 'opening_balances', 'SGD', NEW.id);
 
   -- Create user preferences
-  INSERT INTO user_preferences (user_id, default_household_id)
+  INSERT INTO public.user_preferences (user_id, default_household_id)
   VALUES (NEW.id, new_household_id);
 
   -- Seed default categories
-  PERFORM seed_default_categories(new_household_id, NEW.id);
+  PERFORM public.seed_default_categories(new_household_id, NEW.id);
 
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;

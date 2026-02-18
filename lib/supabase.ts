@@ -16,10 +16,9 @@ export function createBrowserSupabaseClient() {
 // Server client (for server components and server actions)
 // ============================================================
 
-export function createServerSupabaseClient() {
-  // Dynamic import to avoid importing cookies at module level
-  // which breaks in client components
-  const { cookies } = require("next/headers");
+export async function createServerSupabaseClient() {
+  const { cookies } = await import("next/headers");
+  const cookieStore = await cookies();
 
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,12 +26,12 @@ export function createServerSupabaseClient() {
     {
       cookies: {
         getAll() {
-          return cookies().getAll();
+          return cookieStore.getAll();
         },
         setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookies().set(name, value, options)
+              cookieStore.set(name, value, options)
             );
           } catch {
             // The `setAll` method was called from a Server Component.

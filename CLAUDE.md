@@ -6,9 +6,10 @@ A modern, self-hostable personal finance tracker with real double-entry accounti
 
 - **Framework:** Next.js 15 (App Router)
 - **Language:** TypeScript (strict mode)
-- **Styling:** Tailwind CSS v3
+- **Styling:** Tailwind CSS v3 + DaisyUI v4 (semantic component classes)
 - **Database/Auth:** Supabase (PostgreSQL + Auth)
-- **UI Primitives:** Radix UI + class-variance-authority
+- **UI Primitives:** DaisyUI + Radix UI (Dialog, Select, Popover)
+- **Font:** Geist Sans + Geist Mono
 - **Charts:** Recharts
 - **Forms:** React Hook Form + Zod
 - **Dates:** date-fns
@@ -29,37 +30,40 @@ app/
     signup/page.tsx             - Signup page
     callback/route.ts           - OAuth callback
   (app)/
-    layout.tsx                  - App shell (sidebar + bottom nav)
-    page.tsx                    - Dashboard
+    layout.tsx                  - App shell (DaisyUI drawer + sidebar)
+    page.tsx                    - Dashboard (CSS grid, metrics, chart, accounts)
     onboarding/page.tsx         - Guided setup wizard
     transactions/
-      page.tsx                  - Transaction list
+      page.tsx                  - Transaction list (DaisyUI table)
       new/page.tsx              - Add transaction
       [id]/page.tsx             - Edit transaction
     accounts/
-      page.tsx                  - Accounts list with balances
+      page.tsx                  - Accounts list (two-column table layout)
       new/page.tsx              - Add account
       [id]/page.tsx             - Account detail + history
     categories/page.tsx         - Category management
     reports/
-      income-spending/page.tsx  - Income & Spending report
-      net-worth/page.tsx        - Net Worth report
+      page.tsx                  - Combined reports (tabs: I&S + Net Worth)
+      reports-client.tsx        - Client component for report tabs
     settings/
       page.tsx                  - Settings hub
       audit/page.tsx            - Books balance check
+docs/
+  design.md                     - Design principles and DaisyUI theme spec
 components/
-  ui/                           - Button, Input, Card, Dialog, Select, Label, Tabs
-  sidebar.tsx                   - Desktop sidebar nav
-  bottom-nav.tsx                - Mobile bottom nav
+  ui/                           - DaisyUI-styled: Button, Input, Card, Dialog, Select, Label, Tabs, Sheet
+  sidebar.tsx                   - DaisyUI menu sidebar
+  bottom-nav.tsx                - DaisyUI btm-nav
+  metrics-bar.tsx               - DaisyUI stats strip (net worth, income, spending)
+  accounts-panel.tsx            - Compact accounts table for dashboard
   onboarding-wizard.tsx         - 3-step guided setup
   quick-add.tsx                 - FAB + quick entry dialog
   transaction-form.tsx          - Full transaction form (expense/income/transfer)
-  transaction-list.tsx          - Transaction display list
-  account-card.tsx              - Account balance card
+  transaction-list.tsx          - DaisyUI table with compact mode
+  account-card.tsx              - Account balance card (unused, kept for reference)
   account-form.tsx              - Account creation form
   category-form.tsx             - Category creation form
-  summary-cards.tsx             - Dashboard summary (net worth, income, spending)
-  net-worth-sparkline.tsx       - 6-month net worth chart
+  net-worth-sparkline.tsx       - Net worth chart (expanded with axes)
 lib/
   types.ts                      - All TypeScript types
   constants.ts                  - Default categories, account types, currencies

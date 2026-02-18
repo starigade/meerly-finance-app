@@ -138,9 +138,9 @@ export const DEFAULT_EXPENSE_CATEGORIES: DefaultCategory[] = [
 // ============================================================
 
 export const ONBOARDING_ACCOUNT_TEMPLATES = [
-  { name: "Checking Account", sub_type: "checking" as AccountSubType, icon: "landmark" },
-  { name: "Savings Account", sub_type: "savings" as AccountSubType, icon: "piggy-bank" },
-  { name: "Credit Card", sub_type: "credit_card" as AccountSubType, icon: "credit-card" },
-  { name: "Investment Account", sub_type: "investment" as AccountSubType, icon: "trending-up" },
-  { name: "Cash", sub_type: "cash" as AccountSubType, icon: "banknote" },
+  { name: "Checking Account", sub_type: "checking" as AccountSubType, icon: "landmark", description: "Your everyday spending account for bills and purchases" },
+  { name: "Savings Account", sub_type: "savings" as AccountSubType, icon: "piggy-bank", description: "Money set aside for goals or emergencies" },
+  { name: "Credit Card", sub_type: "credit_card" as AccountSubType, icon: "credit-card", description: "Track your credit card balance and spending" },
+  { name: "Investment Account", sub_type: "investment" as AccountSubType, icon: "trending-up", description: "Stocks, ETFs, robo-advisors, or retirement funds" },
+  { name: "Cash", sub_type: "cash" as AccountSubType, icon: "banknote", description: "Physical cash you have on hand" },
 ] as const;

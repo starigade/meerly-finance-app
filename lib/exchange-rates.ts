@@ -48,7 +48,7 @@ export async function getExchangeRate(
 ): Promise<number | null> {
   if (from === to) return 1;
 
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
   const targetDate = date ?? new Date().toISOString().split("T")[0];
 
   // Check DB cache first

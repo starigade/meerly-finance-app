@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { Shield, User, Palette, Database } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Shield } from "lucide-react";
 
 const settingsItems = [
   {
@@ -13,29 +12,22 @@ const settingsItems = [
 
 export default function SettingsPage() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-sm text-muted">Manage your preferences</p>
-      </div>
+    <div className="space-y-4 max-w-2xl mx-auto">
+      <h1 className="text-lg font-semibold">Settings</h1>
 
-      <div className="space-y-2">
+      <ul className="menu bg-base-100 border border-base-300 rounded-box w-full">
         {settingsItems.map((item) => (
-          <Link key={item.href} href={item.href}>
-            <Card className="hover:shadow-elevated transition-shadow cursor-pointer">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-surface-secondary flex items-center justify-center">
-                  <item.icon className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900">{item.title}</p>
-                  <p className="text-sm text-muted">{item.description}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+          <li key={item.href}>
+            <Link href={item.href} className="flex items-center gap-3">
+              <item.icon className="h-5 w-5 text-neutral" />
+              <div>
+                <p className="font-medium text-sm">{item.title}</p>
+                <p className="text-xs text-neutral">{item.description}</p>
+              </div>
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
