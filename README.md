@@ -1,97 +1,74 @@
 # Meerly Finance Tracker
 
-A cross-platform personal finance tracker built with **React Native**, **Expo**, and **NativeWind (Tailwind CSS)**.
+A personal finance tracker web app built with **Next.js**, **TypeScript**, and **Tailwind CSS**. Deployed on **Vercel**.
+
+> **Note:** Mobile support via Expo / React Native is planned for a future release.
 
 ## Features
 
-- 💰 Track income and expenses
-- 📊 View balance and transaction history
-- 💾 Local storage (data persists on device)
-- 🌐 Works on Web, iOS, and Android
+- Track income and expenses
+- View balance and transaction history
+- Local storage (data persists in browser)
+- Responsive web design
 
 ## Tech Stack
 
-- **React Native** - Cross-platform mobile framework
-- **Expo** - Development platform and tooling
-- **Expo Router** - File-based navigation
-- **NativeWind** - Tailwind CSS for React Native
+- **Next.js 15** - React framework (App Router)
 - **TypeScript** - Type safety
+- **Tailwind CSS** - Utility-first styling
+- **Vercel** - Deployment platform
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- npm or yarn
-- Expo Go app (for mobile testing)
+- npm
 
 ### Installation
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
-npm start
-
-# Run on web
-npm run web
-
-# Run on iOS (macOS only)
-npm run ios
-
-# Run on Android
-npm run android
+npm run dev
 ```
 
-### Development
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- Press `w` in the terminal to open web build
-- Press `a` for Android emulator
-- Press `i` for iOS simulator
-- Press `m` to toggle developer menu
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
 
 ## Project Structure
 
 ```
 meerly-finance-app/
 ├── app/
-│   ├── _layout.tsx      # Root layout with navigation
-│   ├── index.tsx        # Home screen (transactions list)
-│   ├── global.css       # Global styles
-│   ├── components/      # Reusable components
-│   ├── screens/         # Screen components
-│   └── utils/           # Utility functions
-├── assets/              # Images, fonts, etc.
-├── node_modules/
+│   ├── layout.tsx      # Root layout
+│   ├── page.tsx        # Main finance tracker page
+│   └── globals.css     # Tailwind CSS imports
+├── public/             # Static assets
+├── CLAUDE.md           # AI assistant context
 ├── package.json
-├── babel.config.js
-├── metro.config.js
 ├── tailwind.config.js
-└── tsconfig.json
+├── postcss.config.js
+├── tsconfig.json
+└── next.config.js
 ```
 
-## Building for Production
+## Deployment
 
-### Web
+Push to GitHub and connect to Vercel. Next.js is auto-detected — zero config needed.
 
-```bash
-npm run build:web
-```
+## Future Plans
 
-The web build will be in the `dist/` folder. Deploy to Vercel, Netlify, or any static hosting.
-
-### Mobile
-
-Build using EAS Build or export locally:
-
-```bash
-# Install EAS CLI
-npm install -g eas-cli
-
-# Build for app stores
-eas build --platform all
-```
+- [ ] Expo / React Native for iOS & Android
+- [ ] Backend API with database
+- [ ] User authentication
 
 ## License
 

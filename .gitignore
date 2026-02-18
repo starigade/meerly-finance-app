@@ -3,18 +3,12 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# Expo
-.expo/
-dist/
-web-build/
-*.expo.tar.gz
+# Next.js
+.next/
+out/
 
 # Build
-android/.gradle/
-android/build/
-ios/build/
-*.ipa
-*.apk
+dist/
 
 # OS
 .DS_Store
@@ -35,3 +29,7 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
