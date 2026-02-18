@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-surface-tertiary;
+  }
+
+  body {
+    @apply bg-surface text-gray-900;
+  }
+}
