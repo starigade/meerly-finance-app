@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { SupabaseProvider } from "@/providers/supabase-provider";
 import { AppSidebar } from "@/components/sidebar";
 import { BottomNav } from "@/components/bottom-nav";
