@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Shield, Upload } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 const settingsItems = [
   {
@@ -21,19 +22,19 @@ export default function SettingsPage() {
     <div className="space-y-4 max-w-2xl mx-auto">
       <h1 className="text-lg font-semibold">Settings</h1>
 
-      <ul className="menu bg-base-100 border border-base-300 rounded-box w-full">
+      <Card className="divide-y">
         {settingsItems.map((item) => (
-          <li key={item.href}>
-            <Link href={item.href} className="flex items-center gap-3">
-              <item.icon className="h-5 w-5 text-neutral" />
+          <div key={item.href}>
+            <Link href={item.href} className="flex items-center gap-3 p-3 hover:bg-muted transition-colors">
+              <item.icon className="h-5 w-5 text-muted-foreground" />
               <div>
                 <p className="font-medium text-sm">{item.title}</p>
-                <p className="text-xs text-neutral">{item.description}</p>
+                <p className="text-xs text-muted-foreground">{item.description}</p>
               </div>
             </Link>
-          </li>
+          </div>
         ))}
-      </ul>
+      </Card>
     </div>
   );
 }

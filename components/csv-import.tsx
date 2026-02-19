@@ -8,6 +8,15 @@ import { parseCsvFile, applyMapping } from "@/lib/csv-parser";
 import { bulkCreateTransactions, checkDuplicateHashes, saveCsvMapping } from "@/lib/actions";
 import { formatMoney } from "@/lib/currency";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import type { CsvColumnMapping, CsvParsedRow, CsvImportResult, Account, Category } from "@/lib/types";
 
 type ImportStep = "upload" | "map" | "preview" | "results";
@@ -186,13 +195,13 @@ export function CsvImport({
             <h3 className="text-base font-semibold mb-1">
               Import CSV — {account.name}
             </h3>
-            <p className="text-sm text-neutral">
+            <p className="text-sm text-muted-foreground">
               Upload a CSV file from your bank to import transactions.
             </p>
           </div>
 
           <div
-            className="border-2 border-dashed border-base-300 rounded-box p-8 text-center hover:border-primary transition-colors cursor-pointer"
+            className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer"
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
             onClick={() => {
@@ -206,19 +215,19 @@ export function CsvImport({
               input.click();
             }}
           >
-            <Upload className="h-8 w-8 text-neutral mx-auto mb-3" />
+            <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm font-medium">
               Drop a CSV file here, or click to browse
             </p>
-            <p className="text-xs text-neutral mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Supports standard bank CSV exports
             </p>
           </div>
 
           {onSkip && (
-            <button className="btn btn-ghost btn-sm w-full" onClick={onSkip}>
+            <Button variant="ghost" size="sm" className="w-full" onClick={onSkip}>
               Skip import
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -239,7 +248,7 @@ export function CsvImport({
         <div className="space-y-4">
           <div>
             <h3 className="text-base font-semibold mb-1">Review Import</h3>
-            <p className="text-sm text-neutral">
+            <p className="text-sm text-muted-foreground">
               {file?.name} — {parsedRows.length} rows parsed
             </p>
           </div>
@@ -256,27 +265,28 @@ export function CsvImport({
           />
 
           <div className="flex gap-3">
-            <button
-              className="btn btn-ghost flex-1"
+            <Button
+              variant="ghost"
+              className="flex-1"
               onClick={() => setStep("map")}
               disabled={importing}
             >
               Back
-            </button>
-            <button
-              className="btn btn-primary flex-1"
+            </Button>
+            <Button
+              className="flex-1"
               onClick={handleImport}
               disabled={importing || selectedRows.size === 0 || !defaultCategoryId}
             >
               {importing ? (
                 <>
-                  <span className="loading loading-spinner loading-sm" />
+                  <Spinner size="sm" />
                   Importing...
                 </>
               ) : (
                 `Import ${selectedRows.size} Transactions`
               )}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -298,45 +308,52 @@ export function CsvImport({
 
           <div>
             <h3 className="text-base font-semibold">Import Complete</h3>
-            <p className="text-sm text-neutral mt-1">{account.name}</p>
+            <p className="text-sm text-muted-foreground mt-1">{account.name}</p>
           </div>
 
-          <div className="stats stats-vertical shadow-sm border border-base-300 w-full">
-            <div className="stat py-3">
-              <div className="stat-title text-xs">Imported</div>
-              <div className="stat-value text-2xl text-success">{result.imported}</div>
-            </div>
+          <div className="flex flex-col border rounded-lg shadow-sm w-full divide-y">
+            <Card className="border-0 shadow-none rounded-none">
+              <CardContent className="px-4 py-3">
+                <div className="text-xs text-muted-foreground">Imported</div>
+                <div className="text-2xl font-bold text-success">{result.imported}</div>
+              </CardContent>
+            </Card>
             {result.skippedDuplicates > 0 && (
-              <div className="stat py-3">
-                <div className="stat-title text-xs">Skipped (duplicates)</div>
-                <div className="stat-value text-2xl text-warning">{result.skippedDuplicates}</div>
-              </div>
+              <Card className="border-0 shadow-none rounded-none">
+                <CardContent className="px-4 py-3">
+                  <div className="text-xs text-muted-foreground">Skipped (duplicates)</div>
+                  <div className="text-2xl font-bold text-warning">{result.skippedDuplicates}</div>
+                </CardContent>
+              </Card>
             )}
             {result.errors.length > 0 && (
-              <div className="stat py-3">
-                <div className="stat-title text-xs">Errors</div>
-                <div className="stat-value text-2xl text-error">{result.errors.length}</div>
-              </div>
+              <Card className="border-0 shadow-none rounded-none">
+                <CardContent className="px-4 py-3">
+                  <div className="text-xs text-muted-foreground">Errors</div>
+                  <div className="text-2xl font-bold text-destructive">{result.errors.length}</div>
+                </CardContent>
+              </Card>
             )}
           </div>
 
           {result.errors.length > 0 && (
-            <div className="collapse collapse-arrow bg-error/5 border border-error/20">
-              <input type="checkbox" />
-              <div className="collapse-title text-sm font-medium text-error">
-                {result.errors.length} error{result.errors.length !== 1 ? "s" : ""}
-              </div>
-              <div className="collapse-content">
-                <ul className="list-disc list-inside text-xs text-error space-y-1">
-                  {result.errors.slice(0, 20).map((e, i) => (
-                    <li key={i}>{e}</li>
-                  ))}
-                  {result.errors.length > 20 && (
-                    <li>...and {result.errors.length - 20} more</li>
-                  )}
-                </ul>
-              </div>
-            </div>
+            <Accordion type="single" collapsible className="bg-destructive/5 border border-destructive/20 rounded-lg">
+              <AccordionItem value="errors" className="border-b-0">
+                <AccordionTrigger className="px-4 py-3 text-sm font-medium text-destructive hover:no-underline">
+                  {result.errors.length} error{result.errors.length !== 1 ? "s" : ""}
+                </AccordionTrigger>
+                <AccordionContent className="px-4">
+                  <ul className="list-disc list-inside text-xs text-destructive space-y-1">
+                    {result.errors.slice(0, 20).map((e, i) => (
+                      <li key={i}>{e}</li>
+                    ))}
+                    {result.errors.length > 20 && (
+                      <li>...and {result.errors.length - 20} more</li>
+                    )}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           )}
         </div>
       )}

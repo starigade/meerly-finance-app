@@ -1,6 +1,8 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Table, TableHeader, TableBody, TableFooter, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { formatMoney } from "@/lib/currency";
 import { UI_LABELS, ACCOUNT_SUB_TYPES } from "@/lib/constants";
 import type { AccountBalance, AccountSubType } from "@/lib/types";
@@ -43,73 +45,77 @@ export function ReportsClient({ monthlyData, monthCount, netWorthReport }: Repor
 
         {/* Income & Spending Tab */}
         <TabsContent value="income-spending" className="space-y-4">
-          <div className="stats stats-horizontal w-full border border-base-300">
-            <div className="stat px-4 py-3">
-              <div className="stat-title text-xs">Total Income</div>
-              <div className="stat-value text-base font-mono tabular-nums text-success">
-                {formatMoney(totalIncome)}
-              </div>
-            </div>
-            <div className="stat px-4 py-3">
-              <div className="stat-title text-xs">Total Spending</div>
-              <div className="stat-value text-base font-mono tabular-nums text-error">
-                {formatMoney(totalExpense)}
-              </div>
-            </div>
-            <div className="stat px-4 py-3">
-              <div className="stat-title text-xs">Net</div>
-              <div className={`stat-value text-base font-mono tabular-nums ${totalIncome - totalExpense >= 0 ? "text-success" : "text-error"}`}>
-                {formatMoney(totalIncome - totalExpense)}
-              </div>
-            </div>
+          <div className="flex flex-wrap gap-3">
+            <Card className="flex-1 min-w-[120px]">
+              <CardContent className="px-4 py-3">
+                <p className="text-xs text-muted-foreground">Total Income</p>
+                <p className="text-base font-bold font-mono tabular-nums text-success">
+                  {formatMoney(totalIncome)}
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="flex-1 min-w-[120px]">
+              <CardContent className="px-4 py-3">
+                <p className="text-xs text-muted-foreground">Total Spending</p>
+                <p className="text-base font-bold font-mono tabular-nums text-destructive">
+                  {formatMoney(totalExpense)}
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="flex-1 min-w-[120px]">
+              <CardContent className="px-4 py-3">
+                <p className="text-xs text-muted-foreground">Net</p>
+                <p className={`text-base font-bold font-mono tabular-nums ${totalIncome - totalExpense >= 0 ? "text-success" : "text-destructive"}`}>
+                  {formatMoney(totalIncome - totalExpense)}
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
-          <div className="card bg-base-100 border border-base-300">
-            <div className="card-body p-4">
+          <Card>
+            <CardContent className="p-4">
               <h2 className="text-sm font-semibold mb-2">Last {monthCount} Months</h2>
-              <div className="overflow-x-auto">
-                <table className="table table-sm">
-                  <thead>
-                    <tr>
-                      <th className="text-xs font-medium text-neutral">Month</th>
-                      <th className="text-xs font-medium text-neutral text-right">Income</th>
-                      <th className="text-xs font-medium text-neutral text-right">Spending</th>
-                      <th className="text-xs font-medium text-neutral text-right">Net</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {monthlyData.map((m) => (
-                      <tr key={m.start} className="hover">
-                        <td className="font-medium text-sm">{m.label}</td>
-                        <td className="text-right font-mono tabular-nums text-sm text-success">
-                          {formatMoney(m.income)}
-                        </td>
-                        <td className="text-right font-mono tabular-nums text-sm text-error">
-                          {formatMoney(m.expense)}
-                        </td>
-                        <td className={`text-right font-mono tabular-nums text-sm font-medium ${m.net >= 0 ? "text-success" : "text-error"}`}>
-                          {formatMoney(m.net)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="font-semibold">
-                      <td>Total</td>
-                      <td className="text-right font-mono tabular-nums text-success">{formatMoney(totalIncome)}</td>
-                      <td className="text-right font-mono tabular-nums text-error">{formatMoney(totalExpense)}</td>
-                      <td className={`text-right font-mono tabular-nums ${totalIncome - totalExpense >= 0 ? "text-success" : "text-error"}`}>
-                        {formatMoney(totalIncome - totalExpense)}
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
-          </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs font-medium">Month</TableHead>
+                    <TableHead className="text-xs font-medium text-right">Income</TableHead>
+                    <TableHead className="text-xs font-medium text-right">Spending</TableHead>
+                    <TableHead className="text-xs font-medium text-right">Net</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {monthlyData.map((m) => (
+                    <TableRow key={m.start}>
+                      <TableCell className="font-medium text-sm">{m.label}</TableCell>
+                      <TableCell className="text-right font-mono tabular-nums text-sm text-success">
+                        {formatMoney(m.income)}
+                      </TableCell>
+                      <TableCell className="text-right font-mono tabular-nums text-sm text-destructive">
+                        {formatMoney(m.expense)}
+                      </TableCell>
+                      <TableCell className={`text-right font-mono tabular-nums text-sm font-medium ${m.net >= 0 ? "text-success" : "text-destructive"}`}>
+                        {formatMoney(m.net)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+                <TableFooter>
+                  <TableRow className="font-semibold">
+                    <TableCell>Total</TableCell>
+                    <TableCell className="text-right font-mono tabular-nums text-success">{formatMoney(totalIncome)}</TableCell>
+                    <TableCell className="text-right font-mono tabular-nums text-destructive">{formatMoney(totalExpense)}</TableCell>
+                    <TableCell className={`text-right font-mono tabular-nums ${totalIncome - totalExpense >= 0 ? "text-success" : "text-destructive"}`}>
+                      {formatMoney(totalIncome - totalExpense)}
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </CardContent>
+          </Card>
 
           {monthlyData.every((m) => m.income === 0 && m.expense === 0) && (
-            <p className="text-center text-neutral py-6 text-sm">
+            <p className="text-center text-muted-foreground py-6 text-sm">
               No transaction data yet. Add some transactions to see your income and spending report.
             </p>
           )}
@@ -117,109 +123,109 @@ export function ReportsClient({ monthlyData, monthCount, netWorthReport }: Repor
 
         {/* Net Worth Tab */}
         <TabsContent value="net-worth" className="space-y-4">
-          <div className="card bg-base-100 border border-base-300">
-            <div className="card-body p-6 text-center">
-              <p className="text-xs text-neutral uppercase tracking-wider mb-1">Total Net Worth</p>
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Total Net Worth</p>
               <p className="text-3xl font-bold font-mono tabular-nums">
                 {formatMoney(netWorth, baseCurrency)}
               </p>
               <div className="flex justify-center gap-6 mt-3 text-sm">
                 <span>
-                  <span className="text-neutral">Assets: </span>
+                  <span className="text-muted-foreground">Assets: </span>
                   <span className="font-medium font-mono text-success">{formatMoney(totalAssets, baseCurrency)}</span>
                 </span>
                 <span>
-                  <span className="text-neutral">Liabilities: </span>
-                  <span className="font-medium font-mono text-error">{formatMoney(Math.abs(totalLiabilities), baseCurrency)}</span>
+                  <span className="text-muted-foreground">Liabilities: </span>
+                  <span className="font-medium font-mono text-destructive">{formatMoney(Math.abs(totalLiabilities), baseCurrency)}</span>
                 </span>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {assets.length > 0 && (
-            <div className="card bg-base-100 border border-base-300">
-              <div className="card-body p-4">
+            <Card>
+              <CardContent className="p-4">
                 <h2 className="text-sm font-semibold mb-2">{UI_LABELS.asset}</h2>
-                <table className="table table-sm">
-                  <thead>
-                    <tr>
-                      <th className="text-xs font-medium text-neutral">Account</th>
-                      <th className="text-xs font-medium text-neutral text-right">Currency</th>
-                      <th className="text-xs font-medium text-neutral text-right">Balance</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs font-medium">Account</TableHead>
+                      <TableHead className="text-xs font-medium text-right">Currency</TableHead>
+                      <TableHead className="text-xs font-medium text-right">Balance</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                     {assets.map((a) => (
-                      <tr key={a.account_id} className="hover">
-                        <td>
+                      <TableRow key={a.account_id}>
+                        <TableCell>
                           <p className="font-medium text-sm">{a.name}</p>
-                          <p className="text-xs text-neutral">
+                          <p className="text-xs text-muted-foreground">
                             {ACCOUNT_SUB_TYPES[a.sub_type as AccountSubType]?.label}
                           </p>
-                        </td>
-                        <td className="text-right text-neutral text-sm">{a.currency}</td>
-                        <td className="text-right font-mono tabular-nums text-sm font-medium text-success">
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground text-sm">{a.currency}</TableCell>
+                        <TableCell className="text-right font-mono tabular-nums text-sm font-medium text-success">
                           {formatMoney(a.balance, a.currency)}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="font-semibold">
-                      <td colSpan={2}>Total Assets</td>
-                      <td className="text-right font-mono tabular-nums text-success">
+                  </TableBody>
+                  <TableFooter>
+                    <TableRow className="font-semibold">
+                      <TableCell colSpan={2}>Total Assets</TableCell>
+                      <TableCell className="text-right font-mono tabular-nums text-success">
                         {formatMoney(totalAssets, baseCurrency)}
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
+                </Table>
+              </CardContent>
+            </Card>
           )}
 
           {liabilities.length > 0 && (
-            <div className="card bg-base-100 border border-base-300">
-              <div className="card-body p-4">
+            <Card>
+              <CardContent className="p-4">
                 <h2 className="text-sm font-semibold mb-2">{UI_LABELS.liability}</h2>
-                <table className="table table-sm">
-                  <thead>
-                    <tr>
-                      <th className="text-xs font-medium text-neutral">Account</th>
-                      <th className="text-xs font-medium text-neutral text-right">Currency</th>
-                      <th className="text-xs font-medium text-neutral text-right">Balance</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs font-medium">Account</TableHead>
+                      <TableHead className="text-xs font-medium text-right">Currency</TableHead>
+                      <TableHead className="text-xs font-medium text-right">Balance</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                     {liabilities.map((a) => (
-                      <tr key={a.account_id} className="hover">
-                        <td>
+                      <TableRow key={a.account_id}>
+                        <TableCell>
                           <p className="font-medium text-sm">{a.name}</p>
-                          <p className="text-xs text-neutral">
+                          <p className="text-xs text-muted-foreground">
                             {ACCOUNT_SUB_TYPES[a.sub_type as AccountSubType]?.label}
                           </p>
-                        </td>
-                        <td className="text-right text-neutral text-sm">{a.currency}</td>
-                        <td className="text-right font-mono tabular-nums text-sm font-medium text-error">
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground text-sm">{a.currency}</TableCell>
+                        <TableCell className="text-right font-mono tabular-nums text-sm font-medium text-destructive">
                           {formatMoney(a.balance, a.currency)}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                  <tfoot>
-                    <tr className="font-semibold">
-                      <td colSpan={2}>Total Liabilities</td>
-                      <td className="text-right font-mono tabular-nums text-error">
+                  </TableBody>
+                  <TableFooter>
+                    <TableRow className="font-semibold">
+                      <TableCell colSpan={2}>Total Liabilities</TableCell>
+                      <TableCell className="text-right font-mono tabular-nums text-destructive">
                         {formatMoney(Math.abs(totalLiabilities), baseCurrency)}
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
+                </Table>
+              </CardContent>
+            </Card>
           )}
 
           {balances.length === 0 && (
-            <p className="text-center text-neutral py-6 text-sm">
+            <p className="text-center text-muted-foreground py-6 text-sm">
               Add accounts to see your net worth breakdown.
             </p>
           )}

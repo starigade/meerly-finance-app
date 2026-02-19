@@ -11,6 +11,18 @@ import {
   Upload,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
@@ -31,6 +43,7 @@ import {
 } from "@/lib/constants";
 import { formatMoney, dollarsToCents } from "@/lib/currency";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import type { AccountSubType, Account, Category, CsvImportResult } from "@/lib/types";
 
 interface OnboardingAccountRow {
@@ -51,6 +64,12 @@ interface CreatedAccount {
 interface OnboardingWizardProps {
   categories: Category[];
 }
+
+const STEPS = [
+  { num: 1, label: "Accounts" },
+  { num: 2, label: "Import" },
+  { num: 3, label: "Summary" },
+];
 
 export function OnboardingWizard({ categories }: OnboardingWizardProps) {
   const router = useRouter();
@@ -158,35 +177,52 @@ export function OnboardingWizard({ categories }: OnboardingWizardProps) {
 
   return (
     <div className="w-full max-w-xl mx-auto">
-      {/* DaisyUI Steps */}
-      <ul className="steps steps-horizontal w-full mb-8 text-xs">
-        <li className={`step ${step >= 1 ? "step-primary" : ""}`}>Accounts</li>
-        <li className={`step ${step >= 2 ? "step-primary" : ""}`}>Import</li>
-        <li className={`step ${step >= 3 ? "step-primary" : ""}`}>Summary</li>
-      </ul>
+      {/* Step Indicator */}
+      <div className="flex items-center justify-center gap-6 mb-8">
+        {STEPS.map((s, i) => (
+          <div key={s.num} className="flex items-center gap-2">
+            {i > 0 && (
+              <div className={cn(
+                "w-8 h-0.5 -ml-4 mr-2",
+                step >= s.num ? "bg-primary" : "bg-muted"
+              )} />
+            )}
+            <div className="flex flex-col items-center gap-1">
+              <div
+                className={cn(
+                  "flex items-center justify-center w-8 h-8 rounded-full text-xs font-medium",
+                  step >= s.num
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
+                )}
+              >
+                {s.num}
+              </div>
+              <span className="text-xs text-muted-foreground">{s.label}</span>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {/* Step 1: Add accounts (dynamic list) */}
       {step === 1 && (
         <div>
           <div className="text-center mb-6">
             <h2 className="text-xl font-bold">Add Your Accounts</h2>
-            <p className="text-neutral text-sm mt-1">
+            <p className="text-muted-foreground text-sm mt-1">
               Add your bank accounts, credit cards, and other financial accounts.
             </p>
           </div>
 
           <div className="space-y-3">
             {accountRows.map((account, i) => (
-              <div
-                key={i}
-                className="card border border-base-300 bg-base-100"
-              >
-                <div className="card-body p-3 space-y-2">
+              <Card key={i}>
+                <CardContent className="p-3 space-y-2">
                   {/* Name + remove */}
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 form-control">
+                    <div className="flex-1">
                       <Input
-                        className="input-sm"
+                        className="h-8 text-sm"
                         placeholder="Account name (e.g. DBS Savings)"
                         value={account.name}
                         onChange={(e) =>
@@ -195,26 +231,25 @@ export function OnboardingWizard({ categories }: OnboardingWizardProps) {
                       />
                     </div>
                     {accountRows.length > 1 && (
-                      <button
-                        className="btn btn-ghost btn-sm btn-square"
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => removeAccountRow(i)}
                       >
-                        <Trash2 className="h-4 w-4 text-neutral" />
-                      </button>
+                        <Trash2 className="h-4 w-4 text-muted-foreground" />
+                      </Button>
                     )}
                   </div>
 
                   {/* Type + Currency + Balance */}
                   <div className="flex gap-2">
-                    <div className="flex-1 form-control">
-                      <label className="label py-0.5">
-                        <span className="label-text text-xs">Type</span>
-                      </label>
+                    <div className="flex-1 space-y-1">
+                      <Label className="text-xs">Type</Label>
                       <Select
                         value={account.sub_type}
                         onValueChange={(v) => handleSubTypeChange(i, v)}
                       >
-                        <SelectTrigger className="select-sm h-8 min-h-0 text-xs">
+                        <SelectTrigger className="h-8 min-h-0 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -238,17 +273,15 @@ export function OnboardingWizard({ categories }: OnboardingWizardProps) {
                       </Select>
                     </div>
 
-                    <div className="w-24 form-control">
-                      <label className="label py-0.5">
-                        <span className="label-text text-xs">Currency</span>
-                      </label>
+                    <div className="w-24 space-y-1">
+                      <Label className="text-xs">Currency</Label>
                       <Select
                         value={account.currency}
                         onValueChange={(v) =>
                           updateAccountRow(i, "currency", v)
                         }
                       >
-                        <SelectTrigger className="select-sm h-8 min-h-0 text-xs">
+                        <SelectTrigger className="h-8 min-h-0 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -261,12 +294,10 @@ export function OnboardingWizard({ categories }: OnboardingWizardProps) {
                       </Select>
                     </div>
 
-                    <div className="w-28 form-control">
-                      <label className="label py-0.5">
-                        <span className="label-text text-xs">Balance</span>
-                      </label>
+                    <div className="w-28 space-y-1">
+                      <Label className="text-xs">Balance</Label>
                       <Input
-                        className="input-sm"
+                        className="h-8 text-sm"
                         type="number"
                         step="0.01"
                         placeholder="0.00"
@@ -277,45 +308,48 @@ export function OnboardingWizard({ categories }: OnboardingWizardProps) {
                       />
                     </div>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
 
           {/* Add another */}
-          <button
-            className="btn btn-ghost btn-sm w-full mt-3 gap-1"
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full mt-3 gap-1"
             onClick={addAccountRow}
           >
             <Plus className="h-4 w-4" />
             Add another account
-          </button>
+          </Button>
 
           {/* Actions */}
           <div className="flex gap-3 mt-6">
-            <button
-              className="btn btn-ghost flex-1"
+            <Button
+              variant="ghost"
+              className="flex-1"
               onClick={() => {
                 setCreatedAccounts([]);
                 setStep(3);
               }}
             >
               Skip for now
-            </button>
-            <button
-              className="btn btn-primary flex-1 gap-2"
+            </Button>
+            <Button
+              className="flex-1 gap-2"
               onClick={handleCreateAccounts}
               disabled={loading || !hasValidAccount}
             >
               {loading ? (
-                <span className="loading loading-spinner loading-sm" />
+                <Spinner size="sm" />
               ) : (
                 <>
                   Continue
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -326,13 +360,12 @@ export function OnboardingWizard({ categories }: OnboardingWizardProps) {
           {/* Progress indicator */}
           {createdAccounts.length > 1 && (
             <div className="text-center mb-4">
-              <p className="text-xs text-neutral">
+              <p className="text-xs text-muted-foreground">
                 Account {importIndex + 1} of {createdAccounts.length}
               </p>
-              <progress
-                className="progress progress-primary w-full h-1.5 mt-1"
-                value={importIndex + 1}
-                max={createdAccounts.length}
+              <Progress
+                className="h-1.5 mt-1"
+                value={((importIndex + 1) / createdAccounts.length) * 100}
               />
             </div>
           )}
@@ -350,21 +383,22 @@ export function OnboardingWizard({ categories }: OnboardingWizardProps) {
 
           {/* Navigation after import results show */}
           <div className="flex gap-3 mt-4">
-            <button
-              className="btn btn-ghost flex-1"
+            <Button
+              variant="ghost"
+              className="flex-1"
               onClick={() => setStep(3)}
             >
               Skip all imports
-            </button>
-            <button
-              className="btn btn-primary flex-1 gap-2"
+            </Button>
+            <Button
+              className="flex-1 gap-2"
               onClick={nextImportOrSummary}
             >
               {importIndex < createdAccounts.length - 1
                 ? "Next Account"
                 : "See Summary"}
               <ArrowRight className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -382,74 +416,75 @@ export function OnboardingWizard({ categories }: OnboardingWizardProps) {
 
           {createdAccounts.length > 0 ? (
             <>
-              <p className="text-neutral text-sm mb-6">
+              <p className="text-muted-foreground text-sm mb-6">
                 {createdAccounts.length} account
                 {createdAccounts.length !== 1 ? "s" : ""} created
                 {totalImported > 0 && ` with ${totalImported} transactions imported`}
               </p>
 
               {/* Net worth */}
-              <div className="card bg-base-100 border border-base-300 mb-4">
-                <div className="card-body p-5">
-                  <p className="text-xs text-neutral uppercase tracking-wider mb-1">
+              <Card className="mb-4">
+                <CardContent className="p-5">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
                     Net Worth
                   </p>
                   <p
                     className={`text-3xl font-bold font-mono tabular-nums ${
-                      totalNetWorth >= 0 ? "text-success" : "text-error"
+                      totalNetWorth >= 0 ? "text-success" : "text-destructive"
                     }`}
                   >
                     {formatMoney(totalNetWorth, DEFAULT_CURRENCY)}
                   </p>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
 
               {/* Account list */}
-              <div className="card bg-base-100 border border-base-300 mb-6">
-                <div className="card-body p-0">
-                  <table className="table table-sm">
-                    <tbody>
+              <Card className="mb-6">
+                <CardContent className="p-0">
+                  <Table>
+                    <TableBody>
                       {createdAccounts.map((acc) => (
-                        <tr key={acc.id}>
-                          <td className="font-medium text-sm">{acc.name}</td>
-                          <td className="text-right text-xs text-neutral">
+                        <TableRow key={acc.id}>
+                          <TableCell className="font-medium text-sm">{acc.name}</TableCell>
+                          <TableCell className="text-right text-xs text-muted-foreground">
                             {acc.importCount > 0 && (
-                              <span className="badge badge-ghost badge-xs mr-2">
+                              <Badge variant="secondary" className="text-[10px] mr-2">
                                 {acc.importCount} imported
-                              </span>
+                              </Badge>
                             )}
-                          </td>
-                          <td className="text-right font-mono tabular-nums text-sm">
+                          </TableCell>
+                          <TableCell className="text-right font-mono tabular-nums text-sm">
                             {formatMoney(acc.balance, acc.currency)}
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
             </>
           ) : (
-            <p className="text-neutral text-sm mb-8">
+            <p className="text-muted-foreground text-sm mb-8">
               No worries! You can add accounts later from the Accounts page.
             </p>
           )}
 
           <div className="space-y-2">
-            <button
-              className="btn btn-primary w-full gap-2"
+            <Button
+              className="w-full gap-2"
               onClick={() => router.push("/")}
             >
               <LayoutDashboard className="h-4 w-4" />
               Go to Dashboard
-            </button>
-            <button
-              className="btn btn-ghost w-full gap-2"
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full gap-2"
               onClick={() => router.push("/transactions/new")}
             >
               <Plus className="h-4 w-4" />
               Add First Transaction
-            </button>
+            </Button>
           </div>
         </div>
       )}

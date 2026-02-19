@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export function TransactionsFilter() {
   const router = useRouter();
@@ -22,10 +23,10 @@ export function TransactionsFilter() {
 
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral" />
-      <input
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <Input
         type="text"
-        className="input input-bordered input-sm w-full pl-9"
+        className="h-8 text-sm w-full pl-9"
         placeholder="Search transactions..."
         value={search}
         onChange={(e) => handleSearch(e.target.value)}

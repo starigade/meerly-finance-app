@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, ArrowLeftRight, Wallet, BarChart3, Settings } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", label: "Home", icon: LayoutDashboard },
@@ -16,7 +17,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <div className="btm-nav btm-nav-sm lg:hidden z-40">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t bg-background py-1 lg:hidden">
       {navItems.map((item) => {
         const active =
           item.href === "/"
@@ -27,13 +28,16 @@ export function BottomNav() {
           <Link
             key={item.href}
             href={item.href}
-            className={active ? "active text-primary" : "text-neutral"}
+            className={cn(
+              "flex flex-col items-center gap-0.5 px-3 py-1.5 text-muted-foreground transition-colors",
+              active && "text-primary"
+            )}
           >
             <item.icon className="h-5 w-5" />
-            <span className="btm-nav-label text-[10px]">{item.label}</span>
+            <span className="text-[10px]">{item.label}</span>
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }

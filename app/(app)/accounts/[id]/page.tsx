@@ -3,6 +3,9 @@ export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Table, TableBody, TableRow, TableCell } from "@/components/ui/table";
 import { createServerSupabaseClient } from "@/lib/supabase";
 import { formatMoney } from "@/lib/currency";
 import { formatDate } from "@/lib/dates";
@@ -38,61 +41,63 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
   return (
     <div className="space-y-4 max-w-2xl mx-auto">
       <div className="flex items-center gap-3">
-        <Link href="/accounts" className="btn btn-ghost btn-sm btn-square">
-          <ArrowLeft className="h-4 w-4" />
-        </Link>
+        <Button variant="ghost" size="icon" asChild>
+          <Link href="/accounts">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </Button>
         <div>
           <h1 className="text-lg font-semibold">{account.name}</h1>
-          <p className="text-xs text-neutral">
+          <p className="text-xs text-muted-foreground">
             {ACCOUNT_SUB_TYPES[account.sub_type as keyof typeof ACCOUNT_SUB_TYPES]?.label ?? account.sub_type} &middot; {account.currency}
           </p>
         </div>
       </div>
 
       {/* Balance */}
-      <div className="card bg-base-100 border border-base-300">
-        <div className="card-body p-6 text-center">
-          <p className="text-xs text-neutral uppercase tracking-wider mb-1">Current Balance</p>
+      <Card>
+        <CardContent className="p-6 text-center">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Current Balance</p>
           <p className="text-3xl font-bold font-mono tabular-nums">
             {formatMoney(account.balance, account.currency)}
           </p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Transaction History */}
-      <div className="card bg-base-100 border border-base-300">
-        <div className="card-body p-4">
+      <Card>
+        <CardContent className="p-4">
           <h2 className="text-sm font-semibold mb-2">Recent Activity</h2>
           {activeEntries.length === 0 ? (
-            <p className="text-center text-neutral py-6 text-sm">No transactions yet</p>
+            <p className="text-center text-muted-foreground py-6 text-sm">No transactions yet</p>
           ) : (
-            <table className="table table-sm">
-              <tbody>
+            <Table>
+              <TableBody>
                 {activeEntries.map((entry) => (
-                  <tr key={entry.id} className="hover">
-                    <td>
+                  <TableRow key={entry.id}>
+                    <TableCell>
                       <Link href={`/transactions/${entry.transaction.id}`} className="hover:text-primary">
                         <p className="font-medium text-sm">
                           {entry.transaction.description ?? entry.category?.name ?? "Transaction"}
                         </p>
-                        <p className="text-xs text-neutral">
+                        <p className="text-xs text-muted-foreground">
                           {formatDate(entry.transaction.date)}
                         </p>
                       </Link>
-                    </td>
-                    <td className="text-right">
-                      <span className={`font-mono tabular-nums text-sm font-medium ${entry.amount > 0 ? "text-success" : "text-error"}`}>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className={`font-mono tabular-nums text-sm font-medium ${entry.amount > 0 ? "text-success" : "text-destructive"}`}>
                         {entry.amount > 0 ? "+" : ""}
                         {formatMoney(entry.amount, entry.currency)}
                       </span>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

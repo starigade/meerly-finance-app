@@ -5,6 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
 import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { Separator } from "@/components/ui/separator";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -35,30 +41,28 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-base-200">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-muted">
       {/* Brand */}
       <div className="mb-6 text-center">
         <h1 className="text-3xl font-bold text-primary tracking-tight">Meerly</h1>
-        <p className="text-xs text-neutral mt-1 tracking-wide uppercase">Personal Finance</p>
+        <p className="text-xs text-muted-foreground mt-1 tracking-wide uppercase">Personal Finance</p>
       </div>
 
       {/* Card */}
-      <div className="card bg-base-100 shadow-lg border border-base-300 w-full max-w-sm">
-        <div className="card-body p-6 gap-4">
+      <Card className="shadow-lg w-full max-w-sm">
+        <CardContent className="p-6 space-y-4">
           <div>
             <h2 className="text-lg font-semibold">Create your account</h2>
-            <p className="text-sm text-neutral">Start tracking your finances in under 2 minutes</p>
+            <p className="text-sm text-muted-foreground">Start tracking your finances in under 2 minutes</p>
           </div>
 
           <form onSubmit={handleSignup} className="space-y-3">
-            <div className="form-control">
-              <label className="label py-1" htmlFor="email">
-                <span className="label-text text-sm font-medium">Email</span>
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
                 id="email"
                 type="email"
-                className="input input-bordered w-full input-sm h-10"
+                className="h-10"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -66,14 +70,12 @@ export default function SignupPage() {
                 autoFocus
               />
             </div>
-            <div className="form-control">
-              <label className="label py-1" htmlFor="password">
-                <span className="label-text text-sm font-medium">Password</span>
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
                 id="password"
                 type="password"
-                className="input input-bordered w-full input-sm h-10"
+                className="h-10"
                 placeholder="At least 6 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -81,23 +83,30 @@ export default function SignupPage() {
                 minLength={6}
               />
             </div>
-            <button type="submit" className="btn btn-primary w-full mt-1" disabled={loading}>
-              {loading ? <span className="loading loading-spinner loading-sm" /> : "Create Account"}
-            </button>
+            <Button type="submit" className="w-full mt-1" disabled={loading}>
+              {loading ? <Spinner size="sm" /> : "Create Account"}
+            </Button>
           </form>
 
-          <div className="divider my-0 text-xs text-neutral">or</div>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator className="w-full" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-card px-2 text-muted-foreground">or</span>
+            </div>
+          </div>
 
-          <p className="text-center text-sm text-neutral">
+          <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="link link-primary font-medium">
+            <Link href="/login" className="text-primary hover:underline font-medium">
               Sign in
             </Link>
           </p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      <p className="text-xs text-neutral/60 mt-6">
+      <p className="text-xs text-muted-foreground/60 mt-6">
         Double-entry accounting, made simple.
       </p>
     </div>

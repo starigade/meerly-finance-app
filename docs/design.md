@@ -18,25 +18,45 @@ Data-dense, warm, precise. A financial cockpit that shows everything at a glance
 - Labels: text-xs uppercase tracking-wider
 - Money: font-mono tabular-nums
 
-## DaisyUI Theme (warm palette)
-- primary: #ee7b18 (brand orange)
-- primary-content: #ffffff
-- base-100: #fefcf9 (warm white)
-- base-200: #f9f5f0 (warm gray)
-- base-300: #f3ede5 (border gray)
-- base-content: #1c1917 (near black)
-- neutral: #78716c (muted text)
-- success: #16a34a
-- error: #dc2626
+## Color System (CSS Variables in globals.css)
+
+All colors defined as HSL values in CSS custom properties:
+
+| Token | Color | Usage |
+|-------|-------|-------|
+| `--primary` | #ee7b18 | Brand orange, buttons, active states |
+| `--primary-foreground` | #ffffff | Text on primary |
+| `--background` | #fefcf9 | Page background (warm white) |
+| `--card` | #fefcf9 | Card background |
+| `--muted` / `--secondary` | #f9f5f0 | Subtle backgrounds |
+| `--border` / `--input` | #f3ede5 | Borders, input outlines |
+| `--foreground` | #1c1917 | Body text (near black) |
+| `--muted-foreground` | #78716c | Secondary text (stone) |
+| `--accent` | #f19038 | Accent highlights |
+| `--destructive` | #dc2626 | Errors, negative values |
+| `--success` | #16a34a | Income, positive values |
+
+## Component Library
+
+**shadcn/ui** (configured in `components.json`):
+- Style: New York
+- CSS variables enabled
+- Components in `components/ui/`
+- Variants via CVA (class-variance-authority)
+
+**Motion primitives** (`components/motion/`):
+- `AnimatedNumber` — Spring-based counting animation for financial figures
+- `InView` — Scroll-triggered entrance animations
+- `DashboardShell` — Staggered page-load reveals
 
 ## Spacing
 - Card padding: p-4
 - Section gaps: gap-4
 - Table cells: px-4 py-2.5
-- Border radius: rounded-xl (cards), rounded-lg (buttons, inputs)
+- Border radius: var(--radius) = 0.5rem, rounded-lg for cards
 
 ## Layout
 - Dashboard: CSS grid, viewport height, no max-width
 - Data pages: No max-width, responsive grid
 - Form pages: max-w-2xl mx-auto
-- Sidebar: w-52 on desktop, drawer overlay on mobile
+- Sidebar: shadcn Sidebar (collapsible offcanvas) on desktop, fixed bottom nav on mobile

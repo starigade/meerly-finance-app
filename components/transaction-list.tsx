@@ -8,6 +8,8 @@ import { TRANSACTION_TYPE_LABELS } from "@/lib/constants";
 import { deleteTransaction } from "@/lib/actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 interface TransactionListProps {
   transactions: any[];
@@ -21,7 +23,7 @@ export function TransactionList({ transactions, showDelete = true, compact = fal
   if (transactions.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-neutral text-sm">No transactions found</p>
+        <p className="text-muted-foreground text-sm">No transactions found</p>
       </div>
     );
   }
@@ -53,25 +55,25 @@ export function TransactionList({ transactions, showDelete = true, compact = fal
   };
 
   return (
-    <table className={`table ${compact ? "table-sm" : ""}`}>
+    <Table>
       {!compact && (
-        <thead>
-          <tr>
-            <th className="text-xs font-medium text-neutral">Description</th>
-            <th className="text-xs font-medium text-neutral hidden sm:table-cell">Date</th>
-            <th className="text-xs font-medium text-neutral hidden md:table-cell">Category</th>
-            <th className="text-xs font-medium text-neutral text-right">Amount</th>
-            {showDelete && <th className="w-8"></th>}
-          </tr>
-        </thead>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="text-xs font-medium">Description</TableHead>
+            <TableHead className="text-xs font-medium hidden sm:table-cell">Date</TableHead>
+            <TableHead className="text-xs font-medium hidden md:table-cell">Category</TableHead>
+            <TableHead className="text-xs font-medium text-right">Amount</TableHead>
+            {showDelete && <TableHead className="w-8"></TableHead>}
+          </TableRow>
+        </TableHeader>
       )}
-      <tbody>
+      <TableBody>
         {transactions.map((txn) => {
           const { category, displayAmount, currency, isExpense } = getDisplayInfo(txn);
 
           return (
-            <tr key={txn.id} className="hover">
-              <td>
+            <TableRow key={txn.id}>
+              <TableCell>
                 <Link href={`/transactions/${txn.id}`} className="hover:text-primary">
                   <div className="flex items-center gap-2">
                     <span
@@ -83,7 +85,7 @@ export function TransactionList({ transactions, showDelete = true, compact = fal
                         {txn.description || category?.name || TRANSACTION_TYPE_LABELS[txn.ui_type]}
                       </p>
                       {compact && (
-                        <p className="text-xs text-neutral">
+                        <p className="text-xs text-muted-foreground">
                           {formatDate(txn.date)}
                           {category && <> &middot; {category.name}</>}
                         </p>
@@ -91,37 +93,39 @@ export function TransactionList({ transactions, showDelete = true, compact = fal
                     </div>
                   </div>
                 </Link>
-              </td>
+              </TableCell>
               {!compact && (
-                <td className="text-sm text-neutral hidden sm:table-cell">
+                <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">
                   {formatDate(txn.date)}
-                </td>
+                </TableCell>
               )}
               {!compact && (
-                <td className="text-sm text-neutral hidden md:table-cell">
+                <TableCell className="text-sm text-muted-foreground hidden md:table-cell">
                   {category?.name ?? "-"}
-                </td>
+                </TableCell>
               )}
-              <td className="text-right">
-                <span className={`font-mono tabular-nums text-sm font-medium ${isExpense ? "text-error" : "text-success"}`}>
+              <TableCell className="text-right">
+                <span className={`font-mono tabular-nums text-sm font-medium ${isExpense ? "text-destructive" : "text-success"}`}>
                   {isExpense ? "-" : "+"}
                   {formatMoney(displayAmount, currency)}
                 </span>
-              </td>
+              </TableCell>
               {showDelete && (
-                <td>
-                  <button
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => handleDelete(txn.id)}
-                    className="btn btn-ghost btn-xs text-neutral hover:text-error"
+                    className="text-muted-foreground hover:text-destructive"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </td>
+                  </Button>
+                </TableCell>
               )}
-            </tr>
+            </TableRow>
           );
         })}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   );
 }

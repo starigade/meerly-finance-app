@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Dialog,
   DialogContent,
@@ -97,12 +99,13 @@ export function QuickAdd({ accounts, categories }: QuickAddProps) {
   return (
     <>
       {/* FAB */}
-      <button
+      <Button
+        size="icon"
+        className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-30 rounded-full h-14 w-14 shadow-elevated"
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-30 btn btn-primary btn-circle btn-lg shadow-elevated"
       >
         <Plus className="h-6 w-6" />
-      </button>
+      </Button>
 
       {/* Quick-add dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
@@ -114,18 +117,22 @@ export function QuickAdd({ accounts, categories }: QuickAddProps) {
           <div className="space-y-3">
             {/* Type toggle */}
             <div className="flex gap-2">
-              <button
-                className={`btn btn-sm flex-1 ${uiType === "expense" ? "btn-primary" : "btn-outline"}`}
+              <Button
+                size="sm"
+                variant={uiType === "expense" ? "default" : "outline"}
+                className="flex-1"
                 onClick={() => { setUiType("expense"); setCategoryId(""); }}
               >
                 Expense
-              </button>
-              <button
-                className={`btn btn-sm flex-1 ${uiType === "income" ? "btn-primary" : "btn-outline"}`}
+              </Button>
+              <Button
+                size="sm"
+                variant={uiType === "income" ? "default" : "outline"}
+                className="flex-1"
                 onClick={() => { setUiType("income"); setCategoryId(""); }}
               >
                 Income
-              </button>
+              </Button>
             </div>
 
             {/* Amount */}
@@ -139,7 +146,7 @@ export function QuickAdd({ accounts, categories }: QuickAddProps) {
                 className="text-2xl font-bold font-mono h-16 text-center"
                 autoFocus
               />
-              <p className="text-xs text-neutral text-center mt-1">{currency}</p>
+              <p className="text-xs text-muted-foreground text-center mt-1">{currency}</p>
             </div>
 
             {/* Category */}
@@ -183,9 +190,9 @@ export function QuickAdd({ accounts, categories }: QuickAddProps) {
               onChange={(e) => setDescription(e.target.value)}
             />
 
-            <button className="btn btn-primary w-full" onClick={handleSubmit} disabled={loading}>
-              {loading ? <span className="loading loading-spinner loading-sm"></span> : "Save"}
-            </button>
+            <Button className="w-full" onClick={handleSubmit} disabled={loading}>
+              {loading ? <Spinner size="sm" /> : "Save"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

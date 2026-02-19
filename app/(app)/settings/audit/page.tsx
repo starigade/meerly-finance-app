@@ -2,6 +2,8 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { ArrowLeft, CheckCircle, AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { createServerSupabaseClient } from "@/lib/supabase";
 
 export default async function AuditPage() {
@@ -31,40 +33,42 @@ export default async function AuditPage() {
   return (
     <div className="space-y-4 max-w-2xl mx-auto">
       <div className="flex items-center gap-3">
-        <Link href="/settings" className="btn btn-ghost btn-sm btn-square">
-          <ArrowLeft className="h-4 w-4" />
-        </Link>
+        <Button variant="ghost" size="icon" asChild>
+          <Link href="/settings">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </Button>
         <h1 className="text-lg font-semibold">Audit</h1>
       </div>
 
-      <div className={`card border ${isBalanced ? "border-success/30" : "border-error/30"}`}>
-        <div className="card-body p-8 text-center">
+      <Card className={isBalanced ? "border-success/30" : "border-destructive/30"}>
+        <CardContent className="p-8 text-center">
           {isBalanced ? (
             <>
               <CheckCircle className="h-16 w-16 text-success mx-auto mb-3" />
               <h2 className="text-lg font-bold mb-1">Books are balanced!</h2>
-              <p className="text-sm text-neutral">
+              <p className="text-sm text-muted-foreground">
                 All transactions have entries that sum to zero. Your double-entry accounting is correct.
               </p>
             </>
           ) : (
             <>
-              <AlertTriangle className="h-16 w-16 text-error mx-auto mb-3" />
+              <AlertTriangle className="h-16 w-16 text-destructive mx-auto mb-3" />
               <h2 className="text-lg font-bold mb-1">
                 {imbalancedCount} imbalanced transaction{imbalancedCount > 1 ? "s" : ""}
               </h2>
-              <p className="text-sm text-neutral">
+              <p className="text-sm text-muted-foreground">
                 Some transactions have entries that don&apos;t sum to zero. This indicates a data integrity issue.
               </p>
             </>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      <div className="card bg-base-100 border border-base-300">
-        <div className="card-body p-4">
+      <Card>
+        <CardContent className="p-4">
           <h2 className="text-sm font-semibold mb-2">How it works</h2>
-          <div className="text-sm text-neutral space-y-2">
+          <div className="text-sm text-muted-foreground space-y-2">
             <p>
               Every transaction in Meerly uses double-entry accounting. This means each transaction has
               two or more entries that must sum to exactly zero in the base currency.
@@ -78,8 +82,8 @@ export default async function AuditPage() {
               a bug created an incomplete transaction.
             </p>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

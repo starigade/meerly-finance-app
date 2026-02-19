@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CsvImport } from "@/components/csv-import";
 import { getCsvMapping } from "@/lib/actions";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -48,29 +51,28 @@ export function ImportClient({ accounts, categories }: ImportClientProps) {
 
   if (accounts.length === 0) {
     return (
-      <div className="card border border-base-300 bg-base-100">
-        <div className="card-body text-center py-12">
-          <p className="text-sm text-neutral mb-3">
+      <Card>
+        <CardContent className="text-center py-12">
+          <p className="text-sm text-muted-foreground mb-3">
             You need at least one account to import transactions.
           </p>
-          <button
-            className="btn btn-primary btn-sm mx-auto"
+          <Button
+            size="sm"
+            className="mx-auto"
             onClick={() => router.push("/accounts/new")}
           >
             Create Account
-          </button>
-        </div>
-      </div>
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <div className="space-y-4">
       {/* Account selector */}
-      <div className="form-control">
-        <label className="label py-1">
-          <span className="label-text text-sm font-medium">Import into account</span>
-        </label>
+      <div className="space-y-2">
+        <Label className="text-sm font-medium">Import into account</Label>
         <Select value={selectedAccountId} onValueChange={(v) => { setSelectedAccountId(v); setDone(false); }}>
           <SelectTrigger>
             <SelectValue placeholder="Select an account" />
@@ -102,8 +104,8 @@ export function ImportClient({ accounts, categories }: ImportClientProps) {
 
       {/* Import component */}
       {selectedAccount && !done && (
-        <div className="card border border-base-300 bg-base-100">
-          <div className="card-body">
+        <Card>
+          <CardContent className="p-6">
             <CsvImport
               account={{
                 id: selectedAccount.id,
@@ -114,25 +116,26 @@ export function ImportClient({ accounts, categories }: ImportClientProps) {
               savedMapping={savedMapping}
               onComplete={handleComplete}
             />
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Done state */}
       {done && (
         <div className="flex gap-3">
-          <button
-            className="btn btn-ghost flex-1"
+          <Button
+            variant="ghost"
+            className="flex-1"
             onClick={() => router.push("/transactions")}
           >
             View Transactions
-          </button>
-          <button
-            className="btn btn-primary flex-1"
+          </Button>
+          <Button
+            className="flex-1"
             onClick={() => setDone(false)}
           >
             Import More
-          </button>
+          </Button>
         </div>
       )}
     </div>

@@ -1,6 +1,10 @@
 "use client";
 
+import { useCallback } from "react";
 import { formatMoney } from "@/lib/currency";
+import { Card, CardContent } from "@/components/ui/card";
+import { AnimatedNumber } from "@/components/motion/animated-number";
+import { InView } from "@/components/motion/in-view";
 
 interface MetricsBarProps {
   netWorth: number;
@@ -10,32 +14,49 @@ interface MetricsBarProps {
 }
 
 export function MetricsBar({ netWorth, monthlyIncome, monthlyExpense, baseCurrency }: MetricsBarProps) {
+  const fmt = useCallback(
+    (cents: number) => formatMoney(cents, baseCurrency),
+    [baseCurrency]
+  );
+
   return (
     <div className="flex flex-wrap gap-3">
-      <div className="card bg-base-100 border border-base-300 flex-1 min-w-[140px]">
-        <div className="card-body px-4 py-3">
-          <p className="text-xs text-neutral">Net Worth</p>
-          <p className="text-lg font-bold font-mono tabular-nums">
-            {formatMoney(netWorth, baseCurrency)}
-          </p>
-        </div>
-      </div>
-      <div className="card bg-base-100 border border-base-300 flex-1 min-w-[140px]">
-        <div className="card-body px-4 py-3">
-          <p className="text-xs text-neutral">Income</p>
-          <p className="text-lg font-bold font-mono tabular-nums text-success">
-            {formatMoney(monthlyIncome, baseCurrency)}
-          </p>
-        </div>
-      </div>
-      <div className="card bg-base-100 border border-base-300 flex-1 min-w-[140px]">
-        <div className="card-body px-4 py-3">
-          <p className="text-xs text-neutral">Spending</p>
-          <p className="text-lg font-bold font-mono tabular-nums text-error">
-            {formatMoney(monthlyExpense, baseCurrency)}
-          </p>
-        </div>
-      </div>
+      <InView className="flex-1 min-w-[140px]" index={0}>
+        <Card className="transition-all hover:shadow-md">
+          <CardContent className="px-4 py-3">
+            <p className="text-xs text-muted-foreground">Net Worth</p>
+            <AnimatedNumber
+              value={netWorth}
+              format={fmt}
+              className="text-lg font-bold font-mono tabular-nums block"
+            />
+          </CardContent>
+        </Card>
+      </InView>
+      <InView className="flex-1 min-w-[140px]" index={1}>
+        <Card className="transition-all hover:shadow-md">
+          <CardContent className="px-4 py-3">
+            <p className="text-xs text-muted-foreground">Income</p>
+            <AnimatedNumber
+              value={monthlyIncome}
+              format={fmt}
+              className="text-lg font-bold font-mono tabular-nums text-success block"
+            />
+          </CardContent>
+        </Card>
+      </InView>
+      <InView className="flex-1 min-w-[140px]" index={2}>
+        <Card className="transition-all hover:shadow-md">
+          <CardContent className="px-4 py-3">
+            <p className="text-xs text-muted-foreground">Spending</p>
+            <AnimatedNumber
+              value={monthlyExpense}
+              format={fmt}
+              className="text-lg font-bold font-mono tabular-nums text-destructive block"
+            />
+          </CardContent>
+        </Card>
+      </InView>
     </div>
   );
 }

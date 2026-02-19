@@ -1,8 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
+} from "@/components/ui/form";
 import { createCategory } from "@/lib/actions";
+import { categoryFormSchema, type CategoryFormValues } from "@/lib/schemas";
 import { toast } from "sonner";
 import type { CategoryType } from "@/lib/types";
 
@@ -20,24 +27,29 @@ export function CategoryForm({
   type: CategoryType;
   onSuccess?: () => void;
 }) {
-  const [name, setName] = useState("");
-  const [color, setColor] = useState(COLORS[0]);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
+  const form = useForm<CategoryFormValues>({
+    resolver: zodResolver(categoryFormSchema),
+    defaultValues: {
+      name: "",
+      color: COLORS[0],
+    },
+  });
 
+  const selectedColor = form.watch("color");
+
+  const onSubmit = async (values: CategoryFormValues) => {
     setLoading(true);
     const result = await createCategory({
-      name: name.trim(),
+      name: values.name.trim(),
       category_type: type,
-      color,
+      color: values.color,
     });
 
     if (result.success) {
-      toast.success(`${name} added`);
-      setName("");
+      toast.success(`${values.name} added`);
+      form.reset();
       onSuccess?.();
     } else {
       toast.error(result.error ?? "Failed to create category");
@@ -46,35 +58,48 @@ export function CategoryForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-end gap-2">
-      <div className="flex-1 form-control">
-        <label className="label text-xs font-medium">Name</label>
-        <Input
-          placeholder={`New ${type} category`}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-end gap-2">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel className="text-xs">Name</FormLabel>
+              <FormControl>
+                <Input placeholder={`New ${type} category`} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div className="form-control">
-        <label className="label text-xs font-medium">Color</label>
-        <div className="flex gap-1 flex-wrap max-w-[200px]">
-          {COLORS.slice(0, 8).map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setColor(c)}
-              className={`w-6 h-6 rounded-md transition-all ${
-                color === c ? "ring-2 ring-offset-1 ring-base-content/30 scale-110" : ""
-              }`}
-              style={{ backgroundColor: c }}
-            />
-          ))}
-        </div>
-      </div>
-      <button type="submit" className="btn btn-primary btn-sm" disabled={loading}>
-        Add
-      </button>
-    </form>
+        <FormField
+          control={form.control}
+          name="color"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-xs">Color</FormLabel>
+              <div className="flex gap-1 flex-wrap max-w-[200px]">
+                {COLORS.slice(0, 8).map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => field.onChange(c)}
+                    className={`w-6 h-6 rounded-md transition-all ${
+                      selectedColor === c ? "ring-2 ring-offset-1 ring-foreground/30 scale-110" : ""
+                    }`}
+                    style={{ backgroundColor: c }}
+                  />
+                ))}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" size="sm" disabled={loading}>
+          Add
+        </Button>
+      </form>
+    </Form>
   );
 }

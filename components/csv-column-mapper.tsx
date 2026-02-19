@@ -2,6 +2,17 @@
 
 import { useState, useMemo } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectLabel, SelectGroup, SelectSeparator } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { CSV_DATE_FORMATS } from "@/lib/constants";
 import { autoDetectMapping, detectDateFormat, parseAmountValue } from "@/lib/csv-parser";
 import type { CsvColumnMapping } from "@/lib/types";
@@ -54,19 +65,19 @@ export function CsvColumnMapper({
   // Live preview of how the mapping interprets sample rows
   const previewRows = useMemo(() => {
     return sampleRows.slice(0, 3).map((row) => {
-      const date = row[dateColumn] ?? "—";
-      const desc = row[descriptionColumn] ?? "—";
-      let amount = "—";
+      const date = row[dateColumn] ?? "\u2014";
+      const desc = row[descriptionColumn] ?? "\u2014";
+      let amount = "\u2014";
       if (mode === "single" && amountColumn) {
         const val = parseAmountValue(row[amountColumn] ?? "");
-        amount = val !== null ? val.toFixed(2) : "—";
+        amount = val !== null ? val.toFixed(2) : "\u2014";
       } else if (mode === "separate") {
         const d = parseAmountValue(row[debitColumn] ?? "");
         const c = parseAmountValue(row[creditColumn] ?? "");
         if (d !== null && d !== 0) amount = (-Math.abs(d)).toFixed(2);
         else if (c !== null && c !== 0) amount = Math.abs(c).toFixed(2);
       }
-      if (invertSign && amount !== "—") {
+      if (invertSign && amount !== "\u2014") {
         const n = parseFloat(amount);
         amount = (-n).toFixed(2);
       }
@@ -78,18 +89,16 @@ export function CsvColumnMapper({
     <div className="space-y-5">
       <div>
         <h3 className="text-base font-semibold mb-1">Map Your Columns</h3>
-        <p className="text-sm text-neutral">
+        <p className="text-sm text-muted-foreground">
           Tell us which CSV columns contain the date, description, and amount.
         </p>
       </div>
 
       {/* Date column */}
-      <div className="form-control">
-        <label className="label py-1">
-          <span className="label-text text-sm font-medium">Date Column</span>
-        </label>
+      <div className="space-y-2">
+        <Label className="text-sm font-medium">Date Column</Label>
         <Select value={dateColumn} onValueChange={setDateColumn}>
-          <SelectTrigger className="select-sm h-9 text-sm">
+          <SelectTrigger className="h-9 text-sm">
             <SelectValue placeholder="Select date column" />
           </SelectTrigger>
           <SelectContent>
@@ -101,15 +110,15 @@ export function CsvColumnMapper({
       </div>
 
       {/* Date format */}
-      <div className="form-control">
-        <label className="label py-1">
-          <span className="label-text text-sm font-medium">Date Format</span>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label className="text-sm font-medium">Date Format</Label>
           {detectedDateFormat && (
-            <span className="label-text-alt text-xs text-success">Auto-detected</span>
+            <span className="text-xs text-success">Auto-detected</span>
           )}
-        </label>
+        </div>
         <Select value={effectiveDateFormat} onValueChange={setDateFormat}>
-          <SelectTrigger className="select-sm h-9 text-sm">
+          <SelectTrigger className="h-9 text-sm">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -123,12 +132,10 @@ export function CsvColumnMapper({
       </div>
 
       {/* Description column */}
-      <div className="form-control">
-        <label className="label py-1">
-          <span className="label-text text-sm font-medium">Description Column</span>
-        </label>
+      <div className="space-y-2">
+        <Label className="text-sm font-medium">Description Column</Label>
         <Select value={descriptionColumn} onValueChange={setDescriptionColumn}>
-          <SelectTrigger className="select-sm h-9 text-sm">
+          <SelectTrigger className="h-9 text-sm">
             <SelectValue placeholder="Select description column" />
           </SelectTrigger>
           <SelectContent>
@@ -140,34 +147,34 @@ export function CsvColumnMapper({
       </div>
 
       {/* Amount mode toggle */}
-      <div className="form-control">
-        <label className="label py-1">
-          <span className="label-text text-sm font-medium">Amount Format</span>
-        </label>
+      <div className="space-y-2">
+        <Label className="text-sm font-medium">Amount Format</Label>
         <div className="flex gap-2">
-          <button
-            className={`btn btn-sm flex-1 ${mode === "single" ? "btn-primary" : "btn-ghost border-base-300"}`}
+          <Button
+            variant={mode === "single" ? "default" : "outline"}
+            size="sm"
+            className="flex-1"
             onClick={() => setMode("single")}
           >
             Single column
-          </button>
-          <button
-            className={`btn btn-sm flex-1 ${mode === "separate" ? "btn-primary" : "btn-ghost border-base-300"}`}
+          </Button>
+          <Button
+            variant={mode === "separate" ? "default" : "outline"}
+            size="sm"
+            className="flex-1"
             onClick={() => setMode("separate")}
           >
             Debit / Credit
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Amount columns */}
       {mode === "single" ? (
-        <div className="form-control">
-          <label className="label py-1">
-            <span className="label-text text-sm font-medium">Amount Column</span>
-          </label>
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Amount Column</Label>
           <Select value={amountColumn} onValueChange={setAmountColumn}>
-            <SelectTrigger className="select-sm h-9 text-sm">
+            <SelectTrigger className="h-9 text-sm">
               <SelectValue placeholder="Select amount column" />
             </SelectTrigger>
             <SelectContent>
@@ -179,12 +186,10 @@ export function CsvColumnMapper({
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
-          <div className="form-control">
-            <label className="label py-1">
-              <span className="label-text text-sm font-medium">Debit Column</span>
-            </label>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Debit Column</Label>
             <Select value={debitColumn} onValueChange={setDebitColumn}>
-              <SelectTrigger className="select-sm h-9 text-sm">
+              <SelectTrigger className="h-9 text-sm">
                 <SelectValue placeholder="Debit" />
               </SelectTrigger>
               <SelectContent>
@@ -194,12 +199,10 @@ export function CsvColumnMapper({
               </SelectContent>
             </Select>
           </div>
-          <div className="form-control">
-            <label className="label py-1">
-              <span className="label-text text-sm font-medium">Credit Column</span>
-            </label>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Credit Column</Label>
             <Select value={creditColumn} onValueChange={setCreditColumn}>
-              <SelectTrigger className="select-sm h-9 text-sm">
+              <SelectTrigger className="h-9 text-sm">
                 <SelectValue placeholder="Credit" />
               </SelectTrigger>
               <SelectContent>
@@ -213,56 +216,53 @@ export function CsvColumnMapper({
       )}
 
       {/* Invert sign */}
-      <label className="label cursor-pointer justify-start gap-3">
-        <input
-          type="checkbox"
-          className="checkbox checkbox-sm checkbox-primary"
+      <div className="flex items-center gap-3">
+        <Checkbox
+          id="invert-sign"
           checked={invertSign}
-          onChange={(e) => setInvertSign(e.target.checked)}
+          onCheckedChange={(checked) => setInvertSign(checked === true)}
         />
-        <span className="label-text text-sm">
+        <label htmlFor="invert-sign" className="text-sm cursor-pointer">
           Invert sign (if your bank uses positive for expenses)
-        </span>
-      </label>
+        </label>
+      </div>
 
       {/* Live preview */}
       {previewRows.length > 0 && (
         <div>
-          <p className="text-xs font-medium text-neutral mb-2 uppercase tracking-wider">Preview</p>
-          <div className="overflow-x-auto">
-            <table className="table table-xs">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Description</th>
-                  <th className="text-right">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {previewRows.map((row, i) => (
-                  <tr key={i}>
-                    <td className="font-mono text-xs">{row.date}</td>
-                    <td className="text-xs max-w-[200px] truncate">{row.desc}</td>
-                    <td className={`text-right font-mono text-xs ${
-                      row.amount !== "—" && parseFloat(row.amount) < 0 ? "text-error" : "text-success"
-                    }`}>
-                      {row.amount}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">Preview</p>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="h-8 text-xs">Date</TableHead>
+                <TableHead className="h-8 text-xs">Description</TableHead>
+                <TableHead className="h-8 text-xs text-right">Amount</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {previewRows.map((row, i) => (
+                <TableRow key={i}>
+                  <TableCell className="font-mono text-xs py-1.5">{row.date}</TableCell>
+                  <TableCell className="text-xs max-w-[200px] truncate py-1.5">{row.desc}</TableCell>
+                  <TableCell className={`text-right font-mono text-xs py-1.5 ${
+                    row.amount !== "\u2014" && parseFloat(row.amount) < 0 ? "text-destructive" : "text-success"
+                  }`}>
+                    {row.amount}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
 
       {/* Actions */}
       <div className="flex gap-3 pt-2">
-        <button className="btn btn-ghost flex-1" onClick={onBack}>
+        <Button variant="ghost" className="flex-1" onClick={onBack}>
           Back
-        </button>
-        <button
-          className="btn btn-primary flex-1"
+        </Button>
+        <Button
+          className="flex-1"
           disabled={!canConfirm}
           onClick={() =>
             onConfirm({
@@ -278,7 +278,7 @@ export function CsvColumnMapper({
           }
         >
           Preview Data
-        </button>
+        </Button>
       </div>
     </div>
   );

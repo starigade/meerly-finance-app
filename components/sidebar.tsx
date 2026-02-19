@@ -11,6 +11,19 @@ import {
   Settings,
 } from "lucide-react";
 
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarSeparator,
+} from "@/components/ui/sidebar";
+
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/transactions", label: "Transactions", icon: ArrowLeftRight },
@@ -19,56 +32,65 @@ const navItems = [
   { href: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
-export function Sidebar() {
+export function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="bg-base-200 w-52 min-h-screen flex flex-col border-r border-base-300">
+    <Sidebar collapsible="offcanvas">
       {/* Logo */}
-      <div className="px-4 pt-4 pb-3">
+      <SidebarHeader className="px-4 pt-4 pb-1">
         <Link href="/" className="text-xl font-bold text-primary tracking-tight">
           Meerly
         </Link>
-      </div>
+      </SidebarHeader>
 
-      {/* Divider */}
-      <div className="mx-3 border-t border-base-300" />
+      <SidebarSeparator />
 
       {/* Nav */}
-      <ul className="menu menu-sm flex-1 px-2 pt-2">
-        {navItems.map((item) => {
-          const active =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map((item) => {
+                const active =
+                  item.href === "/"
+                    ? pathname === "/"
+                    : pathname.startsWith(item.href);
 
-          return (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className={active ? "active font-medium" : ""}
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton asChild isActive={active} tooltip={item.label}>
+                      <Link href={item.href}>
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
       {/* Footer */}
-      <div className="mx-3 border-t border-base-300" />
-      <ul className="menu menu-sm px-2 py-2">
-        <li>
-          <Link
-            href="/settings"
-            className={pathname.startsWith("/settings") ? "active font-medium" : ""}
-          >
-            <Settings className="h-4 w-4" />
-            Settings
-          </Link>
-        </li>
-      </ul>
-    </aside>
+      <SidebarSeparator />
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith("/settings")}
+              tooltip="Settings"
+            >
+              <Link href="/settings">
+                <Settings className="h-4 w-4" />
+                <span>Settings</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
   );
 }

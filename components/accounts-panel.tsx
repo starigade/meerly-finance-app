@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { formatMoney } from "@/lib/currency";
+import { Table, TableBody, TableRow, TableCell } from "@/components/ui/table";
 import type { AccountBalance } from "@/lib/types";
 
 interface AccountsPanelProps {
@@ -11,9 +12,9 @@ interface AccountsPanelProps {
 export function AccountsPanel({ balances }: AccountsPanelProps) {
   if (balances.length === 0) {
     return (
-      <div className="text-center py-6 text-sm text-neutral">
+      <div className="text-center py-6 text-sm text-muted-foreground">
         <p>No accounts yet</p>
-        <Link href="/accounts/new" className="link link-primary text-xs mt-1 inline-block">
+        <Link href="/accounts/new" className="text-primary hover:underline text-xs mt-1 inline-block">
           Add your first account
         </Link>
       </div>
@@ -21,23 +22,23 @@ export function AccountsPanel({ balances }: AccountsPanelProps) {
   }
 
   return (
-    <table className="table table-sm">
-      <tbody>
+    <Table>
+      <TableBody>
         {balances.map((account) => (
-          <tr key={account.account_id} className="hover">
-            <td className="font-medium text-sm">
+          <TableRow key={account.account_id}>
+            <TableCell className="font-medium text-sm">
               <Link href={`/accounts/${account.account_id}`} className="hover:text-primary">
                 {account.name}
               </Link>
-            </td>
-            <td className="text-right font-mono tabular-nums text-sm">
-              <span className={account.balance < 0 ? "text-error" : ""}>
+            </TableCell>
+            <TableCell className="text-right font-mono tabular-nums text-sm">
+              <span className={account.balance < 0 ? "text-destructive" : ""}>
                 {formatMoney(account.balance, account.currency)}
               </span>
-            </td>
-          </tr>
+            </TableCell>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   );
 }

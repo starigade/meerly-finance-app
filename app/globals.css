@@ -1,3 +1,69 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* Meerly warm theme mapped to shadcn CSS variables */
+    /* Format: H S% L% (space-separated for Tailwind's opacity modifier) */
+
+    --background: 36 60% 98.6%;       /* #fefcf9 */
+    --foreground: 12 16% 10%;         /* #1c1917 (stone-900) */
+
+    --card: 36 60% 98.6%;             /* #fefcf9 */
+    --card-foreground: 12 16% 10%;    /* #1c1917 */
+
+    --popover: 36 60% 98.6%;          /* #fefcf9 */
+    --popover-foreground: 12 16% 10%; /* #1c1917 */
+
+    --primary: 27 85% 51%;            /* #ee7b18 — brand orange */
+    --primary-foreground: 0 0% 100%;  /* #ffffff */
+
+    --secondary: 30 33% 96%;          /* #f9f5f0 */
+    --secondary-foreground: 12 16% 10%; /* #1c1917 */
+
+    --muted: 30 33% 96%;              /* #f9f5f0 */
+    --muted-foreground: 25 8% 47%;    /* #78716c (stone-500) */
+
+    --accent: 28 85% 58%;             /* #f19038 */
+    --accent-foreground: 12 16% 10%;  /* #1c1917 */
+
+    --destructive: 0 72% 51%;         /* #dc2626 */
+    --destructive-foreground: 0 0% 100%; /* #ffffff */
+
+    --success: 142 72% 37%;           /* #16a34a */
+    --success-foreground: 0 0% 100%;  /* #ffffff */
+
+    --border: 30 22% 92%;             /* #f3ede5 */
+    --input: 30 22% 92%;              /* #f3ede5 */
+    --ring: 27 85% 51%;               /* #ee7b18 — matches primary */
+
+    --radius: 0.5rem;
+
+    /* Sidebar (shadcn sidebar component) */
+    --sidebar-background: 30 33% 96%;         /* #f9f5f0 */
+    --sidebar-foreground: 12 16% 10%;         /* #1c1917 */
+    --sidebar-primary: 27 85% 51%;            /* #ee7b18 */
+    --sidebar-primary-foreground: 0 0% 100%;  /* #ffffff */
+    --sidebar-accent: 30 22% 92%;             /* #f3ede5 */
+    --sidebar-accent-foreground: 12 16% 10%;  /* #1c1917 */
+    --sidebar-border: 30 22% 92%;             /* #f3ede5 */
+    --sidebar-ring: 27 85% 51%;               /* #ee7b18 */
+
+    /* Chart palette */
+    --chart-1: 27 85% 51%;    /* brand orange */
+    --chart-2: 142 72% 37%;   /* green */
+    --chart-3: 199 89% 48%;   /* blue */
+    --chart-4: 280 65% 60%;   /* purple */
+    --chart-5: 45 93% 47%;    /* yellow */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

@@ -1,130 +1,91 @@
-# Meerly Finance Tracker
+# CLAUDE.md
 
-A modern, self-hostable personal finance tracker with real double-entry accounting under the hood. Beautiful UI. Multi-currency. SGD-first.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Tech Stack
+## What This Is
 
-- **Framework:** Next.js 15 (App Router)
-- **Language:** TypeScript (strict mode)
-- **Styling:** Tailwind CSS v3 + DaisyUI v4 (semantic component classes)
-- **Database/Auth:** Supabase (PostgreSQL + Auth)
-- **UI Primitives:** DaisyUI + Radix UI (Dialog, Select, Popover)
-- **Font:** Geist Sans + Geist Mono
-- **Charts:** Recharts
-- **Forms:** React Hook Form + Zod
-- **Dates:** date-fns
-- **Icons:** Lucide React
-- **Toasts:** Sonner
-- **Testing:** Vitest
-- **Deployment:** Vercel
-
-## Project Structure
-
-```
-app/
-  layout.tsx                    - Root layout (providers, fonts, metadata)
-  page.tsx                      - Root redirect
-  globals.css                   - Tailwind imports + base styles
-  (auth)/
-    login/page.tsx              - Login page
-    signup/page.tsx             - Signup page
-    callback/route.ts           - OAuth callback
-  (app)/
-    layout.tsx                  - App shell (DaisyUI drawer + sidebar)
-    page.tsx                    - Dashboard (CSS grid, metrics, chart, accounts)
-    onboarding/page.tsx         - Guided setup wizard
-    transactions/
-      page.tsx                  - Transaction list (DaisyUI table)
-      new/page.tsx              - Add transaction
-      [id]/page.tsx             - Edit transaction
-    accounts/
-      page.tsx                  - Accounts list (two-column table layout)
-      new/page.tsx              - Add account
-      [id]/page.tsx             - Account detail + history
-    categories/page.tsx         - Category management
-    reports/
-      page.tsx                  - Combined reports (tabs: I&S + Net Worth)
-      reports-client.tsx        - Client component for report tabs
-    settings/
-      page.tsx                  - Settings hub
-      audit/page.tsx            - Books balance check
-docs/
-  design.md                     - Design principles and DaisyUI theme spec
-components/
-  ui/                           - DaisyUI-styled: Button, Input, Card, Dialog, Select, Label, Tabs, Sheet
-  sidebar.tsx                   - DaisyUI menu sidebar
-  bottom-nav.tsx                - DaisyUI btm-nav
-  metrics-bar.tsx               - DaisyUI stats strip (net worth, income, spending)
-  accounts-panel.tsx            - Compact accounts table for dashboard
-  onboarding-wizard.tsx         - 3-step guided setup
-  quick-add.tsx                 - FAB + quick entry dialog
-  transaction-form.tsx          - Full transaction form (expense/income/transfer)
-  transaction-list.tsx          - DaisyUI table with compact mode
-  account-card.tsx              - Account balance card (unused, kept for reference)
-  account-form.tsx              - Account creation form
-  category-form.tsx             - Category creation form
-  net-worth-sparkline.tsx       - Net worth chart (expanded with axes)
-lib/
-  types.ts                      - All TypeScript types
-  constants.ts                  - Default categories, account types, currencies
-  supabase.ts                   - Browser + server + admin clients
-  actions.ts                    - All server actions
-  accounting.ts                 - Double-entry logic, entry creation, validation
-  currency.ts                   - Formatting (S$1,234.56), cents↔dollars
-  exchange-rates.ts             - Fetch rates from frankfurter.app
-  dates.ts                      - date-fns formatting helpers
-  utils.ts                      - cn() utility for Tailwind class merging
-providers/
-  supabase-provider.tsx         - Client-side Supabase context
-middleware.ts                   - Auth redirect middleware
-supabase/
-  migrations/
-    001_initial_schema.sql      - Tables, types, indexes
-    002_rls_policies.sql        - Row-level security
-    003_triggers_and_views.sql  - Balanced entries trigger, views
-    004_seed_defaults.sql       - Default categories, currencies
-  config.toml                   - Local Supabase config
-__tests__/
-  accounting.test.ts            - Double-entry logic tests
-  currency.test.ts              - Currency formatting/conversion tests
-```
+Meerly is a self-hostable personal finance tracker with real double-entry accounting under the hood. Multi-currency, SGD-first, warm UI.
 
 ## Commands
 
-- `npm run dev` - Start development server
-- `npm run build` - Production build
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm test` - Run Vitest tests
-- `npm run test:watch` - Run tests in watch mode
+```bash
+npm run dev          # Start dev server (localhost:3000)
+npm run build        # Production build (also type-checks)
+npm run lint         # ESLint
+npm test             # Run all tests (vitest)
+npm run test:watch   # Watch mode
+```
+
+To run a single test file: `npx vitest run __tests__/accounting.test.ts`
+
+## Tech Stack
+
+Next.js 15 (App Router) · TypeScript · Tailwind CSS v3 + shadcn/ui · Supabase (PostgreSQL + Auth) · Radix UI · Framer Motion · Recharts · React Hook Form + Zod · date-fns · Lucide React · Sonner (toasts) · Vitest · Vercel
+
+## Architecture
+
+### Data Flow Pattern
+
+Server components (pages) fetch data → pass to client components (forms/charts). Mutations go through Server Actions in `lib/actions.ts` which return `{ success, error }` objects. Client components use Sonner toast on failure. `revalidatePath()` refreshes server data after mutations.
+
+### Double-Entry Accounting Model
+
+This is the core abstraction. Every financial event creates a `transaction` header with 2+ `transaction_entries` that **sum to zero in base currency** (enforced by DB trigger).
+
+- **Accounts** = Balance Sheet items (assets: checking, savings, etc. + liabilities: credit cards, loans). Each has `account_type` (asset/liability/equity) and `sub_type`.
+- **Categories** = P&L items (income + expense). These are the counterparty in each entry.
+- **System equity account** "Opening Balances" absorbs opening balance offsets.
+
+Entry creation functions live in `lib/accounting.ts`: `createExpenseEntries()`, `createIncomeEntries()`, `createTransferEntries()`, `createOpeningBalanceEntries()`. Each returns balanced `EntryInput[]` validated by `validateBalancedEntries()`.
+
+**Money is stored as BIGINT cents. Never use floats.** Conversion via `dollarsToCents()`/`centsToDollars()` in `lib/currency.ts`.
+
+### Key Modules
+
+| Module | Purpose |
+|--------|---------|
+| `lib/actions.ts` | All server actions (CRUD for accounts, categories, transactions, CSV import, dashboard data) |
+| `lib/accounting.ts` | Double-entry logic — entry creation + validation |
+| `lib/currency.ts` | Cents↔dollars, formatting (`S$1,234.56`), exchange rate conversion |
+| `lib/types.ts` | All TypeScript types (DB rows, form data, CSV import) |
+| `lib/constants.ts` | Account sub-types, currencies, default categories, CSV column patterns |
+| `lib/csv-parser.ts` | Client-side CSV parsing (papaparse), auto-detect column mapping, SHA-256 import hash |
+| `lib/supabase.ts` | Three clients: browser (client components), server (server components/actions), admin (bypasses RLS) |
+
+### CSV Import System
+
+Client-side parsing (no server upload): `parseCsvFile()` → `autoDetectMapping()` → `applyMapping()`. Duplicate detection via SHA-256 hash of (date + amount + description). Server action `bulkCreateTransactions()` processes in chunks of 50, reuses accounting entry functions. Column mappings saved per-account for reuse.
+
+### UI Architecture
+
+- **shadcn/ui** components in `components/ui/` — Radix primitives + CVA variants + CSS variable theming
+- **Warm Meerly theme** via CSS variables in `globals.css`: primary (#ee7b18), warm backgrounds, stone tones
+- **Framer Motion** animations: `components/motion/animated-number.tsx` (counting-up values), `components/motion/in-view.tsx` (scroll-triggered entrances), `components/dashboard-shell.tsx` (staggered page load)
+- **shadcn Form** (`components/ui/form.tsx`) wraps React Hook Form + Zod for schema-driven validation (`lib/schemas.ts`)
+- Mobile-first: bottom nav on mobile (<768px), shadcn Sidebar on desktop
+- Dashboard uses CSS grid with metrics bar, chart, and accounts panel
+- `components.json` configures shadcn (New York style, CSS variables, `@/components/ui` path)
+
+### Route Groups
+
+- `(auth)/` — login, signup, OAuth callback (no app shell)
+- `(app)/` — main app with SidebarProvider + SidebarInset layout, auth-protected via middleware
 
 ## Supabase
 
 - **Project ID:** `tujyvpmmtcmptiqoixco`
-- Use this project ID for all Supabase-related activities including MCP usage
-- **Supabase URL:** `https://tujyvpmmtcmptiqoixco.supabase.co`
-- All database objects are in migration files — never use the Supabase dashboard
-- Money is stored as BIGINT cents, never floats
-- Double-entry: every transaction has entries summing to zero in base currency
+- **URL:** `https://tujyvpmmtcmptiqoixco.supabase.co`
+- Schema lives in `supabase/migrations/` (001–005). Apply via Supabase MCP `apply_migration` or SQL editor.
+- RLS policies in `002_rls_policies.sql` — all tables scoped to household via `auth.uid()`
 
 ## Conventions
 
-- Use Tailwind CSS utility classes for all styling (no CSS modules or inline styles)
-- Client components use `"use client"` directive
-- Server components for pages, client components for forms/charts
-- Server Actions for mutations, return `{ success, error }` objects
-- Sonner toast for action failures
-- Mobile-first: bottom nav on mobile (<768px), sidebar on desktop
-- Default currency: SGD (S$)
-- UI language: plain English only (no accounting jargon like "debit/credit")
-
-## Accounting Model
-
-- **Accounts** = Balance Sheet (assets + liabilities)
-- **Categories** = P&L (income + expense)
-- **System equity account** "Opening Balances" auto-created per household
-- Every transaction has 2+ entries that sum to zero in base currency
-- DB constraint trigger enforces balanced entries
+- Tailwind CSS utility classes for all styling (no CSS modules or inline styles)
+- Server Actions return `ActionResult<T>` = `{ success, error?, data? }`
+- UI language: plain English only — say "What You Own"/"What You Owe", never "debit/credit"
+- Default currency: SGD (`S$`)
+- Financial figures use `font-mono tabular-nums`
+- Design: warm surfaces, consistent borders (not shadows), data-dense. See `docs/design.md`.
 
 ## Git
 

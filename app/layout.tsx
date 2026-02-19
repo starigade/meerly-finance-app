@@ -15,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-theme="meerly" className={`${GeistSans.variable} ${GeistMono.variable}`}>
-      <body className="font-sans min-h-screen antialiased">
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className="font-sans min-h-screen antialiased bg-background text-foreground">
         {children}
         <Toaster
           position="top-center"

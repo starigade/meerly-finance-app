@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -117,8 +120,8 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
   };
 
   return (
-    <div className="card bg-base-100 border border-base-300">
-      <div className="card-body p-4">
+    <Card>
+      <CardContent className="p-4">
         <h2 className="text-lg font-semibold mb-3">{isEdit ? "Edit Transaction" : "New Transaction"}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Transaction type tabs */}
@@ -135,7 +138,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
 
           {/* Amount + Currency */}
           <div className="flex gap-2">
-            <div className="flex-1 form-control">
+            <div className="flex-1 space-y-2">
               <Label htmlFor="amount">Amount</Label>
               <Input
                 id="amount"
@@ -150,7 +153,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
                 required
               />
             </div>
-            <div className="w-24 form-control">
+            <div className="w-24 space-y-2">
               <Label>Currency</Label>
               <Select value={currency} onValueChange={setCurrency}>
                 <SelectTrigger className="h-14">
@@ -169,7 +172,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
 
           {/* Category (expense/income only) */}
           {uiType !== "transfer" && (
-            <div className="form-control">
+            <div className="space-y-2">
               <Label>Category</Label>
               <Select value={categoryId} onValueChange={setCategoryId} required>
                 <SelectTrigger>
@@ -194,7 +197,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
 
           {/* Account (expense/income) */}
           {uiType !== "transfer" && (
-            <div className="form-control">
+            <div className="space-y-2">
               <Label>{uiType === "expense" ? "From Account" : "To Account"}</Label>
               <Select value={accountId} onValueChange={setAccountId} required>
                 <SelectTrigger>
@@ -214,7 +217,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
           {/* From/To accounts (transfer) */}
           {uiType === "transfer" && (
             <>
-              <div className="form-control">
+              <div className="space-y-2">
                 <Label>From Account</Label>
                 <Select value={fromAccountId} onValueChange={setFromAccountId} required>
                   <SelectTrigger>
@@ -229,7 +232,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
                   </SelectContent>
                 </Select>
               </div>
-              <div className="form-control">
+              <div className="space-y-2">
                 <Label>To Account</Label>
                 <Select value={toAccountId} onValueChange={setToAccountId} required>
                   <SelectTrigger>
@@ -250,7 +253,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
           )}
 
           {/* Date */}
-          <div className="form-control">
+          <div className="space-y-2">
             <Label htmlFor="date">Date</Label>
             <Input
               id="date"
@@ -262,7 +265,7 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
           </div>
 
           {/* Description */}
-          <div className="form-control">
+          <div className="space-y-2">
             <Label htmlFor="description">Description (optional)</Label>
             <Input
               id="description"
@@ -274,19 +277,19 @@ export function TransactionForm({ accounts, categories, editTransaction }: Trans
 
           {/* Actions */}
           <div className="flex gap-3 pt-2">
-            <button type="button" className="btn btn-ghost flex-1" onClick={() => router.back()}>
+            <Button type="button" variant="ghost" className="flex-1" onClick={() => router.back()}>
               Cancel
-            </button>
-            <button type="submit" className="btn btn-primary flex-1" disabled={loading}>
+            </Button>
+            <Button type="submit" className="flex-1" disabled={loading}>
               {loading
-                ? <span className="loading loading-spinner loading-sm"></span>
+                ? <Spinner size="sm" />
                 : isEdit
                   ? "Save Changes"
                   : "Add Transaction"}
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

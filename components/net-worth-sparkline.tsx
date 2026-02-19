@@ -14,7 +14,7 @@ interface NetWorthSparklineProps {
 export function NetWorthSparkline({ snapshots, baseCurrency, compact = false }: NetWorthSparklineProps) {
   if (snapshots.length < 2) {
     return (
-      <div className={`${compact ? "h-24" : "h-[280px]"} flex items-center justify-center text-sm text-neutral`}>
+      <div className={`${compact ? "h-24" : "h-[280px]"} flex items-center justify-center text-sm text-muted-foreground`}>
         Net worth trend will appear after your second month
       </div>
     );
@@ -64,8 +64,8 @@ export function NetWorthSparkline({ snapshots, baseCurrency, compact = false }: 
               if (!active || !payload?.[0]) return null;
               const { month, value } = payload[0].payload;
               return (
-                <div className="bg-base-100 rounded-lg shadow-elevated px-3 py-2 text-xs border border-base-300">
-                  <p className="text-neutral">{month}</p>
+                <div className="bg-popover text-popover-foreground rounded-lg shadow-elevated px-3 py-2 text-xs border">
+                  <p className="text-muted-foreground">{month}</p>
                   <p className="font-semibold font-mono">{formatMoney(value, baseCurrency)}</p>
                 </div>
               );
