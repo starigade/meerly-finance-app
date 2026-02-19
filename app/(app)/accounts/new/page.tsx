@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { AccountForm } from "@/components/account-form";
 
 export default function NewAccountPage() {
